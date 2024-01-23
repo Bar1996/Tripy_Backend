@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import express from 'express';
 import admin from 'firebase-admin';
-import {getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithCredential} from "firebase/auth";
+import {getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithCredential, setPersistence,signInWithEmailAndPassword, browserLocalPersistence } from "firebase/auth";
 import {firebaseConfig} from "./firebaseConfig.js";
 import cors from "cors";
 import bodyParser from "body-parser";
@@ -133,7 +133,6 @@ async function checkEmailInUse(email) {
 
 app.post('/post_signin', async (req, res) => {
     const { email, password } = req.body.credentials;
-    auth = getAuth();
   
     try {
       await setPersistence(auth, browserLocalPersistence);
