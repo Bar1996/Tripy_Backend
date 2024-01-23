@@ -37,6 +37,7 @@ let date = null;
 let mail = null;
 let pass = null;
 let phone = null;
+let auth2 = null;
 
 app.post('/signup', async (req, res) => {
     console.log('enter');
@@ -133,16 +134,17 @@ async function checkEmailInUse(email) {
 
 app.post('/post_signin', async (req, res) => {
     const { email, password } = req.body.credentials;
+    auth2 = getAuth();
   
     try {
-      await setPersistence(auth, browserLocalPersistence);
-      await signInWithEmailAndPassword(auth, email, password);
+      await setPersistence(auth2, browserLocalPersistence);
+      await signInWithEmailAndPassword(auth2, email, password);
   
       if (!auth.currentUser.emailVerified) {
         console.log('Need to verify email');
         res.send('You need to verify your email');
       } else {
-        console.log(`Baruch Haba Ya Malshin!${auth.currentUser.email.toString()}`);
+        console.log(`Baruch Haba Ya Malshin!${auth2.currentUser.email.toString()}`);
         console.log('Transfer to Home page');
         res.send('Welcome !');
       }
