@@ -17,7 +17,8 @@ admin.initializeApp({
 });
 
 const app = express();
-const port = 3000; // Your desired port
+const port = process.env.PORT || 3000;
+const serverURL = "https://backend-app-jbun.onrender.com";
 const firestore_app = initializeApp(firebaseConfig);
 const auth = getAuth(firestore_app);
 // app.use(cors({ origin: 'https://localhost:19006' }));
@@ -130,11 +131,35 @@ async function checkEmailInUse(email) {
     }
 }
 
+app.post('/post_signin', async (req, res) => {
+    const { email, password } = req.body.credentials;
+    auth = getAuth();
+  
+    try {
+      await setPersistence(auth, browserLocalPersistence);
+      await signInWithEmailAndPassword(auth, email, password);
+  
+      if (!auth.currentUser.emailVerified) {
+        console.log('Need to verify email');
+        res.send('You need to verify your email');
+      } else {
+        console.log(`Baruch Haba Ya Malshin!${auth.currentUser.email.toString()}`);
+        console.log('Transfer to Home page');
+        res.send('Welcome !');
+      }
+    } catch (error) {
+      console.log('Incorrect details');
+      console.log(error);
+      res.send('Incorrect details');
+    }
+  });
 
+
+  
 app.get('/', (req, res) => {
     res.send('Server is running');
 });
 
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+    console.log(`Server is running on port ${port} and url: ${serverURL}`);
 });
