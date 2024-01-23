@@ -149,7 +149,7 @@ app.post('/post_signin', async (req, res) => {
     } catch (error) {
       console.log('Incorrect details');
       console.log(error);
-      res.send('Incorrect details');
+      res.send(`Incorrect details ${password} and url: ${email}`);
     }
   });
 
