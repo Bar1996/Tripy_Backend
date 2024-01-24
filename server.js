@@ -1,7 +1,14 @@
 import { initializeApp } from 'firebase/app';
 import express from 'express';
 import admin from 'firebase-admin';
-import {getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithCredential, setPersistence,signInWithEmailAndPassword, browserLocalPersistence } from "firebase/auth";
+import {
+    createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword,
+    fetchSignInMethodsForEmail, sendEmailVerification, sendPasswordResetEmail, setPersistence, browserLocalPersistence,
+    updatePassword, reauthenticateWithCredential, EmailAuthProvider, signInWithCredential,GoogleAuthProvider
+} from 'firebase/auth';
+import {
+    getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, where, query, updateDoc,
+} from 'firebase/firestore';
 import {firebaseConfig} from "./firebaseConfig.js";
 import cors from "cors";
 import bodyParser from "body-parser";
@@ -20,43 +27,38 @@ const app = express();
 const port = process.env.PORT || 3000;
 const serverURL = "https://backend-app-jbun.onrender.com";
 const firestore_app = initializeApp(firebaseConfig);
+const db = getFirestore(firestore_app);
 const auth = getAuth(firestore_app);
-// app.use(cors({ origin: 'https://localhost:19006' }));
+
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 
-
-let dateValid = false;
 let emailValid = false;
 let passwordValid = false;
-let fullName = null;
-let date = null;
 let mail = null;
 let pass = null;
-let phone = null;
-let auth2 = null;
+let auth2 = getAuth();
 
-app.post('/signup', async (req, res) => {
-    console.log('enter');
-    const { email, password } = req.body;
-    try {
-        const userRecord = await admin.auth().createUser({
-            email,
-            password,
-            // You can add more properties here if needed (displayName, etc.)
-        });
-
-        console.log('Successfully created new user:', userRecord.uid);
-        res.send('User signed up successfully');
-        console.log('check');
-    } catch (error) {
-        console.error('Error creating user:', error);
-        res.status(500).send('Error signing up');
-    }
-});
+// app.post('/signup', async (req, res) => {
+//     console.log('enter');
+//     const { email, password } = req.body;
+//     try {
+//         const userRecord = await admin.auth().createUser({
+//             email,
+//             password,
+//         });
+//
+//         console.log('Successfully created new user:', userRecord.uid);
+//         res.send('User signed up successfully');
+//         console.log('check');
+//     } catch (error) {
+//         console.error('Error creating user:', error);
+//         res.status(500).send('Error signing up');
+//     }
+// });
 
 
 app.post('/post_email', async (req, res) => {
@@ -140,7 +142,7 @@ app.post('/post_signin', async (req, res) => {
       await setPersistence(auth2, browserLocalPersistence);
       await signInWithEmailAndPassword(auth2, email, password);
   
-      if (!auth.currentUser.emailVerified) {
+      if (!auth2.currentUser.emailVerified) {
         console.log('Need to verify email');
         res.send('You need to verify your email');
       } else {
@@ -163,4 +165,51 @@ app.get('/', (req, res) => {
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port} and url: ${serverURL}`);
+});
+
+
+app.post('/signup', async (req, res) => {
+    const { email, password } = req.body;
+    if (passwordValid && emailValid ) {
+        const user = {
+            email: email,
+            password: password,
+        };
+
+        const adduser = {
+            email: email,
+            password: password,
+        };
+        try {
+            const docRef = await createUserWithEmailAndPassword(auth, user.email, user.password);
+            const userObj = docRef.user;
+            try {
+                console.log('sending mail');
+                await sendEmailVerification(userObj);
+                console.log('Email verification sent');
+            } catch (error) {
+                console.error('Error sending email verification:', error);
+            }
+
+            console.log('Transfer to Home Page');
+            res.send('yes');
+            try {
+                // Save the post data to Firestore
+                const newUser = { ...adduser, uid: userObj.uid };
+                await addDoc(collection(db, 'Users'), newUser);
+                console.log('Post data saved:', newUser);
+            } catch (error) {
+                console.error('Error sending email verification:', error);
+            }
+        } catch (e) {
+            if (e.code === 'auth/email-already-in-use') {
+                // Handle the case where the email is already in use
+                console.log('Email is already in use. Please choose a different email.');
+                res.send('Email already in use');
+            } else console.error('Error adding document: ', e);
+        }
+    } else {
+        console.log('Not valid signup');
+        res.send('no');
+    }
 });
