@@ -85,10 +85,12 @@ app.post('/signup', async (req, res) => {
             res.send('yes');
             try {
                 // Save the post data to Firestore
-                const newUser = { ...adduser, uid: userObj.uid };
-                const usersCollection = collection(db, 'Users');
-                await addDoc(usersCollection, newUser);
-                console.log('Post data saved:', newUser);
+                await addDoc(collection(db, "users"), {
+                    email: email,
+                    uid: userObj.uid,
+                });
+
+                console.log('Post data saved:');
             } catch (error) {
                 console.error('Error sending email verification:', error);
             }
