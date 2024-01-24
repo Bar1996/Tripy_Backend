@@ -59,7 +59,50 @@ let auth2 = getAuth();
 //         res.status(500).send('Error signing up');
 //     }
 // });
+app.post('/signup', async (req, res) => {
+    const { email, password } = req.body;
+    if (passwordValid && emailValid ) {
+        const user = {
+            email: email,
+            password: password,
+        };
 
+        const adduser = {
+            email: email,
+        };
+        try {
+            const docRef = await createUserWithEmailAndPassword(auth, user.email, user.password);
+            const userObj = docRef.user;
+            try {
+                console.log('sending mail');
+                await sendEmailVerification(userObj);
+                console.log('Email verification sent');
+            } catch (error) {
+                console.error('Error sending email verification:', error);
+            }
+
+            console.log('Transfer to Home Page');
+            res.send('yes');
+            try {
+                // Save the post data to Firestore
+                const newUser = { ...adduser, uid: userObj.uid };
+                await addDoc(collection(db, 'Users'), newUser);
+                console.log('Post data saved:', newUser);
+            } catch (error) {
+                console.error('Error sending email verification:', error);
+            }
+        } catch (e) {
+            if (e.code === 'auth/email-already-in-use') {
+                // Handle the case where the email is already in use
+                console.log('Email is already in use. Please choose a different email.');
+                res.send('Email already in use');
+            } else console.error('Error adding document: ', e);
+        }
+    } else {
+        console.log('Not valid signup');
+        res.send('no');
+    }
+});
 
 app.post('/post_email', async (req, res) => {
     console.log("req.body: ", req.body);
@@ -168,48 +211,4 @@ app.listen(port, () => {
 });
 
 
-app.post('/signup', async (req, res) => {
-    const { email, password } = req.body;
-    if (passwordValid && emailValid ) {
-        const user = {
-            email: email,
-            password: password,
-        };
 
-        const adduser = {
-            email: email,
-            password: password,
-        };
-        try {
-            const docRef = await createUserWithEmailAndPassword(auth, user.email, user.password);
-            const userObj = docRef.user;
-            try {
-                console.log('sending mail');
-                await sendEmailVerification(userObj);
-                console.log('Email verification sent');
-            } catch (error) {
-                console.error('Error sending email verification:', error);
-            }
-
-            console.log('Transfer to Home Page');
-            res.send('yes');
-            try {
-                // Save the post data to Firestore
-                const newUser = { ...adduser, uid: userObj.uid };
-                await addDoc(collection(db, 'Users'), newUser);
-                console.log('Post data saved:', newUser);
-            } catch (error) {
-                console.error('Error sending email verification:', error);
-            }
-        } catch (e) {
-            if (e.code === 'auth/email-already-in-use') {
-                // Handle the case where the email is already in use
-                console.log('Email is already in use. Please choose a different email.');
-                res.send('Email already in use');
-            } else console.error('Error adding document: ', e);
-        }
-    } else {
-        console.log('Not valid signup');
-        res.send('no');
-    }
-});
