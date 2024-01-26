@@ -24,7 +24,7 @@ admin.initializeApp({
 });
 
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 const serverURL = "https://backend-app-jbun.onrender.com";
 const firestore_app = initializeApp(firebaseConfig);
 const db = getFirestore(firestore_app);
@@ -61,6 +61,7 @@ let auth2 = getAuth();
 // });
 app.post('/signup', async (req, res) => {
     const { email, password } = req.body;
+    auth2 = getAuth();
     if (passwordValid && emailValid ) {
         const user = {
             email: email,
@@ -71,7 +72,7 @@ app.post('/signup', async (req, res) => {
             email: email,
         };
         try {
-            const docRef = await createUserWithEmailAndPassword(auth, user.email, user.password);
+            const docRef = await createUserWithEmailAndPassword(auth2, user.email, user.password);
             const userObj = docRef.user;
             try {
                 console.log('sending mail');
@@ -84,6 +85,7 @@ app.post('/signup', async (req, res) => {
             console.log('Transfer to Home Page');
             res.send('yes');
             try {
+                console.log('checkpoint email: ', email, 'uid:', userObj.uid );
                 // Save the post data to Firestore
                 await addDoc(collection(db, "users"), {
                     email: email,
@@ -209,8 +211,8 @@ app.get('/', (req, res) => {
     res.send('Server is running');
 });
 
-app.listen(port, () => {
-    console.log(`Server is running on port ${port} and url: ${serverURL}`);
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT} and url: ${serverURL}`);
 });
 
 
