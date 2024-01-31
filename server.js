@@ -42,23 +42,7 @@ let mail = null;
 let pass = null;
 let auth2 = getAuth();
 
-// app.post('/signup', async (req, res) => {
-//     console.log('enter');
-//     const { email, password } = req.body;
-//     try {
-//         const userRecord = await admin.auth().createUser({
-//             email,
-//             password,
-//         });
-//
-//         console.log('Successfully created new user:', userRecord.uid);
-//         res.send('User signed up successfully');
-//         console.log('check');
-//     } catch (error) {
-//         console.error('Error creating user:', error);
-//         res.status(500).send('Error signing up');
-//     }
-// });
+
 app.post('/signup', async (req, res) => {
     const { email, password } = req.body;
     auth2 = getAuth();
@@ -154,17 +138,32 @@ app.post('/post_password', async (req, res) => {
 
 
 app.post('/signInGoogle', async (req, res) => {
-    try{
-        console.log('Received a request to /signInGoogle:', req.body);
-        console.log("google enter")
-        const {id_token} = req.body;
-        const credential = GoogleAuthProvider.credential(id_token);
-        await signInWithCredential(auth, credential);
-        res.status(200).send('Sign in successful');
+    try {
+        const { user } = req.body;
+        const userUid = user.uid;
+        const email = user.email;
+
+        // Check if the user already exists in the database
+        const usersCollection = collection(db, 'users');
+        const userQuery = query(usersCollection, where('uid', '==', userUid));
+        const userQuerySnapshot = await getDocs(userQuery);
+
+        if (userQuerySnapshot.empty) {
+            // User does not exist, add them to the database
+            await addDoc(usersCollection, {
+                email: email,
+                uid: userUid,
+            });
+
+            res.status(200).json({ success: true });
+        } else {
+            // User already exists, handle it accordingly
+            res.status(200).json({ success: false, message: 'User already exists' });
+        }
     } catch (error) {
-    console.error('Server Error:', error);
-    res.status(500).send('Internal Server Error');
-}
+        console.error('Error signing in with Google', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
 
 async function checkEmailInUse(email) {
