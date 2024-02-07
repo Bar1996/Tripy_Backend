@@ -1,0 +1,25 @@
+### POST /signup - Sign Up with Email and Password
+POST  http://192.168.32.56:3000/signup/signup
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "test123"
+}
+
+#### POST /post_email - Post Email
+POST http://192.168.32.56:3000/signup/post_email
+Content-Type: application/json
+
+{
+  "email": "test@example.com"
+}
+
+
+### POST /post_password - Post Password
+POST  http://192.168.32.56:3000/signup/post_password
+Content-Type: application/json
+
+{
+  "password": "test123"
+}

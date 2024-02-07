@@ -1,19 +1,8 @@
-// const admin = require('firebase-admin');
-//
-//
-// const serviceAccount = require('./server-firebase-keys.json');
-//
-// admin.initializeApp({
-//     credential: admin.credential.cert(serviceAccount),
-// });
-//
-// module.exports = admin;
+const { initializeApp } = require('firebase/app');
+const { getFirestore } = require('firebase/firestore');
+const { getAuth } = require('firebase/auth');
+const admin = require('firebase-admin');
 
-
-
-import { initializeApp } from "firebase/app";
-//import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
 
 const firebaseConfig = {
     apiKey: "AIzaSyAL0c1rZ9JLMIcobBeuc8YpZPP-AC_GE84",
@@ -25,7 +14,14 @@ const firebaseConfig = {
     measurementId: "G-6MPNKQGPBX"
 };
 
-const app = initializeApp(firebaseConfig);
-//const analytics = getAnalytics(app);
+admin.initializeApp({
+    credential: admin.credential.cert("./server-firebase-keys.json"),
+    projectId: 'tripy-e6333',
 
-export {firebaseConfig};
+});
+const firestore_app = initializeApp(firebaseConfig);
+const db = getFirestore(firestore_app);
+const auth = getAuth(firestore_app);
+
+
+module.exports =  {firestore_app, firebaseConfig, db, auth};
