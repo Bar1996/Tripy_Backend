@@ -2,6 +2,7 @@ const { getAuth, createUserWithEmailAndPassword, sendEmailVerification } = requi
 const {collection, addDoc} = require('firebase/firestore');
 const admin = require('firebase-admin');
 const { db } = require('../firebaseConfig.js');
+const { checkEmailInUse } = require('../helpers/checkEmailInUse.js');
 
 let emailValid = false;
 let passwordValid = false;
@@ -86,22 +87,6 @@ const PostEmail = async (req, res) => {
 
     console.log(email);
 };
-
-
-async function checkEmailInUse(email) {
-    try {
-        const user = await admin.auth().getUserByEmail(email);
-        return user.providerData.length > 0; // Returns true if email is already in use
-    } catch (error) {
-        // If the user is not found, it means the email is not in use
-        if (error.code === 'auth/user-not-found') {
-            return false;
-        }
-
-        console.error('Error checking email:', error);
-        throw error;
-    }
-}
 
 const PostPassword = async (req, res) => {
     const { password } = req.body;

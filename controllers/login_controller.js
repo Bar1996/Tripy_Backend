@@ -2,7 +2,9 @@ const { getAuth, signInWithEmailAndPassword } = require('firebase/auth');
 const {collection, addDoc, getDocs, where, query} = require('firebase/firestore');
 const admin = require('firebase-admin');
 const { db } = require('../firebaseConfig.js');
-const { browserLocalPersistence, setPersistence } = require('firebase/auth');
+const { browserLocalPersistence, setPersistence, sendPasswordResetEmail, fetchSignInMethodsForEmail } = require('firebase/auth');
+const { checkEmailInUse } = require('../helpers/checkEmailInUse.js');
+
 
 let auth2 = getAuth();
 
@@ -60,6 +62,34 @@ const LoginWithEmailAndPassword = async (req, res) => {
     }
 };
 
-module.exports = {LoginWithEmailAndPassword, signInGoogle};
 
+const resetPassword = async (req, res) => {
+  const { email } = req.body;
+  auth2 = getAuth();
+  console.log('Email:', email);
+    try {
+      const isEmailInUse = await checkEmailInUse(email);
+      console.log('isEmailInUse:', isEmailInUse);
 
+      if (isEmailInUse) {
+        sendPasswordResetEmail(auth2, email)
+          .then(() => {
+            // Password reset email sent successfully
+            console.log('If the email address exists in our system, a password reset email will be sent');
+            res.send('sent successfully');
+          })
+          .catch((error) => {
+            // An error occurred while sending the password reset email
+            console.error(error);
+          });
+      } else {
+        res.send('If the email address exists in our system, a password reset email will be sent');
+      }
+    } catch (error) {
+      console.error('Error checking email:', error);
+      res.status(500).send('An error occurred while checking the email');
+    }
+  console.log(email);
+};
+
+module.exports = {LoginWithEmailAndPassword, signInGoogle, resetPassword};
