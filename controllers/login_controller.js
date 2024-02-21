@@ -4,6 +4,7 @@ const admin = require('firebase-admin');
 const { db } = require('../firebaseConfig.js');
 const { browserLocalPersistence, setPersistence, sendPasswordResetEmail, fetchSignInMethodsForEmail } = require('firebase/auth');
 const { checkEmailInUse } = require('../helpers/checkEmailInUse.js');
+const axios = require('axios');
 
 
 let auth2 = getAuth();
@@ -76,7 +77,7 @@ const resetPassword = async (req, res) => {
           .then(() => {
             // Password reset email sent successfully
             console.log('If the email address exists in our system, a password reset email will be sent');
-            res.send('sent successfully');
+            res.send('If the email address exists in our system, a password reset email will be sent');
           })
           .catch((error) => {
             // An error occurred while sending the password reset email
@@ -92,4 +93,18 @@ const resetPassword = async (req, res) => {
   console.log(email);
 };
 
-module.exports = {LoginWithEmailAndPassword, signInGoogle, resetPassword};
+
+
+//TODO: Add the Maps function
+const Maps =  async (req, res) => {
+  const { place_id } = req.params;
+  try {
+      const response = await axios.get(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${place_id}&key=${process.env.GOOGLE_MAPS_API_KEY}`);
+      const data = response.data;
+      res.json(data);
+  } catch (error) {
+      console.error('Error fetching place details:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+module.exports = {LoginWithEmailAndPassword, signInGoogle, resetPassword, Maps};

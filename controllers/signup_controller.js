@@ -1,5 +1,5 @@
 const { getAuth, createUserWithEmailAndPassword, sendEmailVerification } = require('firebase/auth');
-const {collection, addDoc} = require('firebase/firestore');
+const {collection, addDoc, updateDoc, getDocs, doc, query, where} = require('firebase/firestore');
 const admin = require('firebase-admin');
 const { db } = require('../firebaseConfig.js');
 const { checkEmailInUse } = require('../helpers/checkEmailInUse.js');
@@ -34,7 +34,8 @@ const SignUpWithEmailAndPassword = async (req, res) => {
             }
 
             console.log('Transfer to Home Page');
-            res.send('yes');
+            // Return user ID along with the response
+            res.send({ success: true, userId: userObj.uid });
             try {
                 console.log('checkpoint email: ', email, 'uid:', userObj.uid );
                 // Save the post data to Firestore
@@ -45,7 +46,7 @@ const SignUpWithEmailAndPassword = async (req, res) => {
 
                 console.log('Post data saved:');
             } catch (error) {
-                console.error('Error sending email verification:', error);
+                console.error('Error saving user data:', error);
             }
         } catch (e) {
             if (e.code === 'auth/email-already-in-use') {
@@ -59,6 +60,7 @@ const SignUpWithEmailAndPassword = async (req, res) => {
         res.send('no');
     }
 };
+
 
 const PostEmail = async (req, res) => {
     console.log("req.body: ", req.body);
@@ -103,4 +105,49 @@ const PostPassword = async (req, res) => {
     console.log(password);
 };
 
-module.exports = { SignUpWithEmailAndPassword, PostEmail, PostPassword};
+const addDetails = async (req, res) => {
+    try {
+        // Check if userId exists in request body
+        if (!req.body.uid) {
+            res.status(400).send('uid is required');
+            return;
+        }
+
+        const uid = req.body.uid; // Unique identifier for the user
+        const name = req.body.name;
+        const gender = req.body.gender;
+        const dateString = req.body.birthday;
+        
+        console.log('uid:', uid);
+        console.log('name:', name);
+        console.log('gender:', gender);
+        console.log('dateOfBirth:', dateString);
+
+        // Fetch the user document from Firestore by uid
+        const q = query(collection(db, 'users'), where('uid', '==', uid));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            res.status(404).send('User not found');
+            return;
+        }
+
+        // Assuming there's only one user with the given uid, get its reference
+        const userDoc = querySnapshot.docs[0].ref;
+
+        // Update the user document with the new information
+        await updateDoc(userDoc, {
+            name: name,
+            gender: gender,
+            dateOfBirth: dateString // Assuming dateOfBirth field exists in your Firestore schema
+        });
+
+        res.status(200).send('Details added successfully');
+    } catch (error) {
+        console.error('Error adding details:', error);
+        res.status(500).send('Error adding details');
+    }
+};
+
+
+module.exports = { SignUpWithEmailAndPassword, PostEmail, PostPassword, addDetails};

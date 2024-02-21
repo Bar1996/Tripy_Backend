@@ -36,9 +36,30 @@ Content-Type: application/json
 
 
 ### POST /resetPass - Post login
-POST  http://10.100.102.25:3000/resetPass
+POST  http://192.168.33.29:3000/resetPass
 Content-Type: application/json
 
 {
   "email": "bar3166@gmail.com"
 }
+
+
+### Fetch Place Details
+GET http://192.168.33.29:3000/place-details/ChIJvY4MLQmjAhUR1sOGnGeGoj0
+Content-Type: application/json
+
+{
+  "place_id": "ChIJvY4MLQmjAhUR1sOGnGeGoj0"
+}
+
+### Fetch Place Details
+POST http://10.100.102.25:3000/addDetails
+Content-Type: application/json
+
+{
+  "uid": "ibVHPtXXssWE3bzZbCw8SryvJbC2",
+  "name": "Bar Cohen",
+  "birthday": "1993-03-16",
+  "gender": "Male"
+}
+
