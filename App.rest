@@ -63,3 +63,17 @@ Content-Type: application/json
   "gender": "Male"
 }
 
+#####
+
+POST http://192.168.32.97:3000/generatePlan
+Content-Type: application/json
+
+{
+    "gender": "Male",
+    "age": 28,
+    "preferences": ["beach", "city", "extreme"],
+    "destination": "Barcelona",
+    "social": "with friends",
+    "arrivalDate": "10/03/24",
+    "departureDate": "14/03/24"
+}
