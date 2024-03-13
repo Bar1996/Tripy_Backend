@@ -17,7 +17,10 @@ const LoginWithEmailAndPassword = async (req, res) => {
   
     try {
       await setPersistence(auth2, browserLocalPersistence);
-      await signInWithEmailAndPassword(auth2, email, password);
+      const userRecord = await signInWithEmailAndPassword(auth2, email, password);
+      // const token = await userRecord.user.getIdToken();
+      // const refreshToken = userRecord.user.refreshToken;
+      
   
       if (!auth2.currentUser.emailVerified) {
         console.log('Need to verify email');
@@ -25,6 +28,7 @@ const LoginWithEmailAndPassword = async (req, res) => {
       } else {
         console.log(`Baruch Haba Ya Malshin!${auth2.currentUser.email.toString()}`);
         console.log('Transfer to Home page');
+        // res.json({ token, refreshToken});
         res.send('Welcome !');
       }
     } catch (error) {

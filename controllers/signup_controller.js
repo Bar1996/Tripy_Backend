@@ -11,7 +11,8 @@ let pass = null;
 let auth2 = getAuth();
 
 const SignUpWithEmailAndPassword = async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password } = req.body;   
+    const haveDetails = '0';
     auth2 = getAuth();
     if (passwordValid && emailValid ) {
         const user = {
@@ -42,6 +43,7 @@ const SignUpWithEmailAndPassword = async (req, res) => {
                 await addDoc(collection(db, "users"), {
                     email: email,
                     uid: userObj.uid,
+                    haveDetails: haveDetails
                 });
 
                 console.log('Post data saved:');
@@ -60,7 +62,6 @@ const SignUpWithEmailAndPassword = async (req, res) => {
         res.send('no');
     }
 };
-
 
 const PostEmail = async (req, res) => {
     console.log("req.body: ", req.body);
@@ -117,6 +118,7 @@ const addDetails = async (req, res) => {
         const name = req.body.name;
         const gender = req.body.gender;
         const dateString = req.body.birthday;
+        const haveDetails = '1';
         
         console.log('uid:', uid);
         console.log('name:', name);
@@ -139,7 +141,8 @@ const addDetails = async (req, res) => {
         await updateDoc(userDoc, {
             name: name,
             gender: gender,
-            dateOfBirth: dateString // Assuming dateOfBirth field exists in your Firestore schema
+            dateOfBirth: dateString, // Assuming dateOfBirth field exists in your Firestore schema
+            haveDetails: haveDetails
         });
 
         res.status(200).send('Details added successfully');

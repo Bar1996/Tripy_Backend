@@ -1,9 +1,9 @@
 ### POST /signup - Sign Up with Email and Password
-POST  http://10.100.102.25:3000/signup
+POST  http://172.20.10.3:3000/signup
 Content-Type: application/json
 
 {
-  "email": "bar31616@gmail.com",
+  "email": "test123@gmail.com",
   "password": "test123"
 }
 
@@ -26,21 +26,21 @@ Content-Type: application/json
 
 
 ### POST /login - Post login
-POST  http://10.100.102.25:3000/login
+POST  http://172.20.10.3:3000/login
 Content-Type: application/json
 
 {
-  "email": "bar31616@gmail.com",
-  "password": "Bar1234567"
+  "email": "idobn98@gmail.com",
+  "password": "qwerty1234"
 }
 
 
 ### POST /resetPass - Post login
-POST  http://192.168.33.29:3000/resetPass
+POST  http://172.20.10.3:3000/resetPass
 Content-Type: application/json
 
 {
-  "email": "bar3166@gmail.com"
+  "email": "idobn98@gmail.com"
 }
 
 
@@ -53,13 +53,21 @@ Content-Type: application/json
 }
 
 ### Fetch Place Details
-POST http://10.100.102.25:3000/addDetails
+POST http://172.20.10.3:3000/addDetails
 Content-Type: application/json
 
 {
-  "uid": "ibVHPtXXssWE3bzZbCw8SryvJbC2",
-  "name": "Bar Cohen",
+  "uid": "m4mTB17VQTamDEcPEf07shnUKOR2",
+  "name": "Ido Haganuv",
   "birthday": "1993-03-16",
   "gender": "Male"
 }
 
+####
+
+POST  http://172.20.10.3:3000/check-details
+Content-Type: application/json
+
+{
+    "uid": "zEen4Iga6TXrnl9bVU0pXNqAVt22"
+}
