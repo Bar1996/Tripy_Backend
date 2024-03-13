@@ -63,11 +63,3 @@ Content-Type: application/json
   "gender": "Male"
 }
 
-####
-
-POST  http://172.20.10.3:3000/check-details
-Content-Type: application/json
-
-{
-    "uid": "zEen4Iga6TXrnl9bVU0pXNqAVt22"
-}
