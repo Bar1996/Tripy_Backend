@@ -30,8 +30,8 @@ POST  http://172.20.10.3:3000/login
 Content-Type: application/json
 
 {
-  "email": "idobn98@gmail.com",
-  "password": "qwerty1234"
+  "email": "Bar31616@gmail.com",
+  "password": "Bar1234"
 }
 
 
@@ -57,9 +57,9 @@ POST http://172.20.10.3:3000/addDetails
 Content-Type: application/json
 
 {
-  "uid": "m4mTB17VQTamDEcPEf07shnUKOR2",
-  "name": "Ido Haganuv",
-  "birthday": "1993-03-16",
+  "uid": "vZ24Kn8WLoVesI2c796ptTa5R2v2",
+  "name": "Bar Cohen",
+  "birthday": "1996-03-14",
   "gender": "Male"
 }
 

@@ -125,6 +125,14 @@ const addDetails = async (req, res) => {
         console.log('gender:', gender);
         console.log('dateOfBirth:', dateString);
 
+        const birthDate = new Date(dateString);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        console.log('age:', age);
         // Fetch the user document from Firestore by uid
         const q = query(collection(db, 'users'), where('uid', '==', uid));
         const querySnapshot = await getDocs(q);
@@ -142,7 +150,8 @@ const addDetails = async (req, res) => {
             name: name,
             gender: gender,
             dateOfBirth: dateString, // Assuming dateOfBirth field exists in your Firestore schema
-            haveDetails: haveDetails
+            haveDetails: haveDetails,
+            age: age
         });
 
         res.status(200).send('Details added successfully');
