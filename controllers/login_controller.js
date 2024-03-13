@@ -31,9 +31,9 @@ const LoginWithEmailAndPassword = async (req, res) => {
         // res.json({ token, refreshToken});
         haveDetails = await CheckDetails();
         if (haveDetails === '1') {
-          res.send('Welcome ! You have details');
+          res.send({ success: true });
         }else {
-          res.send('Welcome ! You do not have details, please fill in the details form');
+          res.send({ success: false, userId: userRecord.uid});
         }
         
       }
