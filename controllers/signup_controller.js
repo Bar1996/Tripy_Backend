@@ -161,5 +161,57 @@ const addDetails = async (req, res) => {
     }
 };
 
+const addPreferences = async (req, res) => {
+    try {
+        // Check if userId exists in request body
+        if (!req.body.uid) {
+            res.status(400).send('uid is required');
+            return;
+        }
 
-module.exports = { SignUpWithEmailAndPassword, PostEmail, PostPassword, addDetails};
+        const uid = req.body.uid; // Unique identifier for the user
+        const preferences = req.body.preferences; // Get preferences from request body
+        const havePreferences = '1';
+
+        // Check if user exists in 'users' collection
+        const userQuerySnapshot = await getDocs(query(collection(db, 'users'), where('uid', '==', uid)));
+        if (userQuerySnapshot.empty) {
+            res.status(404).send('User not found');
+            return;
+        }
+
+        const userData = userQuerySnapshot.docs[0].data();
+        const preferencesUid = userData.preferences_uid;
+
+        // Check if user has preferences_uid
+        if (preferencesUid) {
+            // Update preferences document in 'preferences' collection
+            const preferencesDocRef = doc(db, 'preferences', preferencesUid);
+            await updateDoc(preferencesDocRef, { preferences, uid });
+        } else {
+            // Create new preferences document
+            const preferencesDocRef = await addDoc(collection(db, 'preferences'), { preferences, uid });
+            const preferencesUid = preferencesDocRef.id;
+            
+            // Update 'users' collection with preferencesUid
+            const userDocRef = userQuerySnapshot.docs[0].ref;
+            await updateDoc(userDocRef, { preferences_uid: preferencesUid });
+        }
+
+        res.status(200).send('Preferences added successfully');
+    } catch (error) {
+        console.error('Error adding preferences:', error);
+        res.status(500).send('Error adding preferences');
+    }
+};
+
+
+
+
+module.exports = { 
+    SignUpWithEmailAndPassword,
+    PostEmail,
+    PostPassword,
+    addDetails,
+    addPreferences 
+};

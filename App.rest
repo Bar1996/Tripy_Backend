@@ -63,3 +63,13 @@ Content-Type: application/json
   "gender": "Male"
 }
 
+
+### Fetch Place Details
+POST http://172.20.10.3:3000/addPreferences 
+Content-Type: application/json
+
+{
+  "uid": "3gayeHd2kXasVzP9KweamwFv7E32",
+  "preferences": ["Ido", "Ha", "Zain"]
+}
+
