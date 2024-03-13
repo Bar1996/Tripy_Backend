@@ -29,7 +29,13 @@ const LoginWithEmailAndPassword = async (req, res) => {
         console.log(`Baruch Haba Ya Malshin!${auth2.currentUser.email.toString()}`);
         console.log('Transfer to Home page');
         // res.json({ token, refreshToken});
-        res.send('Welcome !');
+        haveDetails = await CheckDetails();
+        if (haveDetails === '1') {
+          res.send('Welcome ! You have details');
+        }else {
+          res.send('Welcome ! You do not have details, please fill in the details form');
+        }
+        
       }
     } catch (error) {
       console.log('Incorrect details');
@@ -111,4 +117,50 @@ const Maps =  async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
   }
 };
-module.exports = {LoginWithEmailAndPassword, signInGoogle, resetPassword, Maps};
+
+const CheckDetails = async (req, res) => {
+  try {
+      // Ensure user is authenticated
+      const auth2 = getAuth();
+      
+      // Get the UID of the authenticated user
+      const uid = auth2.currentUser.uid;
+
+      // Assuming 'users' is the collection name where your user data resides
+      const usersCollection = collection(db, 'users');
+
+      // Query the user document by uid
+      const q = query(usersCollection, where('uid', '==', uid));
+
+      // Get documents that match the query
+      const querySnapshot = await getDocs(q);
+
+      // If no documents match the query
+      if (querySnapshot.empty) {
+          return ({message: "No user found with the provided UID" }) ;
+      }
+
+      // Assuming there's only one document for each user
+      const userData = querySnapshot.docs[0].data();
+      const haveDetails = userData.haveDetails;
+
+      if (haveDetails === '1' || haveDetails === '0') {
+          // 'haveDetails' field is either '1' or '0'
+          return haveDetails;
+      } else {
+          // 'haveDetails' field is neither '1' nor '0'
+          return ({message: "Invalid value for 'haveDetails' field" }) ;
+      }
+  } catch (error) {
+      // Handle errors
+      console.error('Error checking details:', error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+
+
+
+
+
+module.exports = {LoginWithEmailAndPassword, signInGoogle, resetPassword, Maps, CheckDetails};
