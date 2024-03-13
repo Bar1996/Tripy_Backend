@@ -18,6 +18,7 @@ const LoginWithEmailAndPassword = async (req, res) => {
     try {
       await setPersistence(auth2, browserLocalPersistence);
       const userRecord = await signInWithEmailAndPassword(auth2, email, password);
+      console.log('userRecord:', userRecord.user.uid);
       // const token = await userRecord.user.getIdToken();
       // const refreshToken = userRecord.user.refreshToken;
       
@@ -33,7 +34,7 @@ const LoginWithEmailAndPassword = async (req, res) => {
         if (haveDetails === '1') {
           res.send({ success: true });
         }else {
-          res.send({ success: false, userId: userRecord.uid});
+          res.send({ success: false, userId: userRecord.user.uid});
         }
         
       }
