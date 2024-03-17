@@ -27,17 +27,20 @@ const LoginWithEmailAndPassword = async (req, res) => {
         console.log('Need to verify email');
         res.send('You need to verify your email');
       } else {
-        console.log(`Baruch Haba Ya Malshin!${auth2.currentUser.email.toString()}`);
-        console.log('Transfer to Home page');
+        // console.log(`Baruch Haba Ya Malshin!${auth2.currentUser.email.toString()}`);
+        // console.log('Transfer to Home page');
         // res.json({ token, refreshToken});
         haveDetails = await CheckDetails();
         havePreferences = await CheckPreferences();
         if (haveDetails === '1' && havePreferences === '1') {
+          console.log('Transfer to Home Page');
           res.send({ success: true });
         }else if (haveDetails === '0') {
+          console.log('Transfer to DetailsScreen');
           res.send({ success: false, userId: userRecord.user.uid, tranferTo: 'DetailsScreen'});
         }
-        else if (havePreferences === '0') {
+        else{
+          console.log('Transfer to Preferences');
           res.send({ success: false, userId: userRecord.user.uid, tranferTo: 'Preferences'});
         }
         

@@ -13,6 +13,7 @@ let auth2 = getAuth();
 const SignUpWithEmailAndPassword = async (req, res) => {
     const { email, password } = req.body;   
     const haveDetails = '0';
+    const havePreferences = '0';
     auth2 = getAuth();
     if (passwordValid && emailValid ) {
         const user = {
@@ -43,7 +44,8 @@ const SignUpWithEmailAndPassword = async (req, res) => {
                 await addDoc(collection(db, "users"), {
                     email: email,
                     uid: userObj.uid,
-                    haveDetails: haveDetails
+                    haveDetails: haveDetails,
+                    havePreferences: havePreferences
                 });
 
                 console.log('Post data saved:');
