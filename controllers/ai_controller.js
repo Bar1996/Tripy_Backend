@@ -10,7 +10,7 @@ const apiKey = process.env.GOOGLE_MAPS_API_KEY;
   const generatePlan = async (req, res) => {
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
     const prompt = `I am ${req.body.gender} aged ${req.body.age}, I really like ${req.body.preferences}.
-  I am planning a vacation in Barcelona ${req.body.social}. I will be at the destination on ${req.body.arrivalDate} - ${req.body.departureDate}. 
+  I am planning a vacation in ${req.body.location} ${req.body.social}. I will be at the destination on ${req.body.arrivalDate} - ${req.body.departureDate}. 
   Create a travel plan for me for each day separately based on the ratings of the places on google maps 
   especially from users with the same age range and consider the seasons. 
       Please dont recommend me what to do and give me only places names for each day. 

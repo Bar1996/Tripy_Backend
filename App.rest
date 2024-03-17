@@ -31,7 +31,7 @@ Content-Type: application/json
 
 {
   "email": "Bar31616@gmail.com",
-  "password": "Bar1234"
+  "password": "Bar1234567"
 }
 
 
@@ -71,5 +71,20 @@ Content-Type: application/json
 {
   "uid": "vZ24Kn8WLoVesI2c796ptTa5R2v2",
   "preferences": ["Ido", "Ha", "Zain"]
+}
+
+
+### Plan Vacation
+POST http://localhost:3000/generatePlan 
+Content-Type: application/json
+
+{
+  "gender": "Male",
+  "age": "25",
+  "preferences": ["Beach", "Museum", "Bar"],
+  "arrivalDate": "2024-08-01",
+  "departureDate": "2024-08-10",
+  "social": "Solo",
+  "location": "Paris"
 }
 
