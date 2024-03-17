@@ -31,10 +31,14 @@ const LoginWithEmailAndPassword = async (req, res) => {
         console.log('Transfer to Home page');
         // res.json({ token, refreshToken});
         haveDetails = await CheckDetails();
-        if (haveDetails === '1') {
+        havePreferences = await CheckPreferences();
+        if (haveDetails === '1' && havePreferences === '1') {
           res.send({ success: true });
-        }else {
-          res.send({ success: false, userId: userRecord.user.uid});
+        }else if (haveDetails === '0') {
+          res.send({ success: false, userId: userRecord.user.uid, tranferTo: 'DetailsScreen'});
+        }
+        else if (havePreferences === '0') {
+          res.send({ success: false, userId: userRecord.user.uid, tranferTo: 'Preferences'});
         }
         
       }
@@ -148,6 +152,47 @@ const CheckDetails = async (req, res) => {
       if (haveDetails === '1' || haveDetails === '0') {
           // 'haveDetails' field is either '1' or '0'
           return haveDetails;
+      } else {
+          // 'haveDetails' field is neither '1' nor '0'
+          return ({message: "Invalid value for 'haveDetails' field" }) ;
+      }
+  } catch (error) {
+      // Handle errors
+      console.error('Error checking details:', error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+
+const CheckPreferences = async (req, res) => {
+  try {
+      // Ensure user is authenticated
+      const auth2 = getAuth();
+      
+      // Get the UID of the authenticated user
+      const uid = auth2.currentUser.uid;
+
+      // Assuming 'users' is the collection name where your user data resides
+      const usersCollection = collection(db, 'users');
+
+      // Query the user document by uid
+      const q = query(usersCollection, where('uid', '==', uid));
+
+      // Get documents that match the query
+      const querySnapshot = await getDocs(q);
+
+      // If no documents match the query
+      if (querySnapshot.empty) {
+          return ({message: "No user found with the provided UID" }) ;
+      }
+
+      // Assuming there's only one document for each user
+      const userData = querySnapshot.docs[0].data();
+      const havePreferences = userData.havePreferences;
+
+      if (havePreferences === '1' || havePreferences === '0') {
+          // 'haveDetails' field is either '1' or '0'
+          return havePreferences;
       } else {
           // 'haveDetails' field is neither '1' nor '0'
           return ({message: "Invalid value for 'haveDetails' field" }) ;

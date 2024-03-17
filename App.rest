@@ -1,5 +1,5 @@
 ### POST /signup - Sign Up with Email and Password
-POST  http://172.20.10.3:3000/signup
+POST  http://localhost:3000/signup
 Content-Type: application/json
 
 {
@@ -8,7 +8,7 @@ Content-Type: application/json
 }
 
 #### POST /post_email - Post Email
-POST http://10.100.102.25:3000/post_email
+POST http://localhost:3000/post_email
 Content-Type: application/json
 
 {
@@ -17,7 +17,7 @@ Content-Type: application/json
 
 
 ### POST /post_password - Post Password
-POST  http://10.100.102.25:3000/post_password
+POST  http://localhost:3000/post_password
 Content-Type: application/json
 
 {
@@ -26,7 +26,7 @@ Content-Type: application/json
 
 
 ### POST /login - Post login
-POST  http://172.20.10.3:3000/login
+POST  http://localhost:3000/login
 Content-Type: application/json
 
 {
@@ -36,7 +36,7 @@ Content-Type: application/json
 
 
 ### POST /resetPass - Post login
-POST  http://172.20.10.3:3000/resetPass
+POST  http://localhost:3000/resetPass
 Content-Type: application/json
 
 {
@@ -45,7 +45,7 @@ Content-Type: application/json
 
 
 ### Fetch Place Details
-GET http://192.168.33.29:3000/place-details/ChIJvY4MLQmjAhUR1sOGnGeGoj0
+GET http://localhost:3000/place-details/ChIJvY4MLQmjAhUR1sOGnGeGoj0
 Content-Type: application/json
 
 {
@@ -53,7 +53,7 @@ Content-Type: application/json
 }
 
 ### Fetch Place Details
-POST http://172.20.10.3:3000/addDetails
+POST http://localhost:3000/addDetails
 Content-Type: application/json
 
 {
@@ -65,11 +65,11 @@ Content-Type: application/json
 
 
 ### Fetch Place Details
-POST http://172.20.10.3:3000/addPreferences 
+POST http://localhost:3000/addPreferences 
 Content-Type: application/json
 
 {
-  "uid": "3gayeHd2kXasVzP9KweamwFv7E32",
+  "uid": "vZ24Kn8WLoVesI2c796ptTa5R2v2",
   "preferences": ["Ido", "Ha", "Zain"]
 }
 

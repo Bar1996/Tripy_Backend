@@ -195,7 +195,7 @@ const addPreferences = async (req, res) => {
             
             // Update 'users' collection with preferencesUid
             const userDocRef = userQuerySnapshot.docs[0].ref;
-            await updateDoc(userDocRef, { preferences_uid: preferencesUid });
+            await updateDoc(userDocRef, { preferences_uid: preferencesUid, havePreferences});
         }
 
         res.status(200).send('Preferences added successfully');
