@@ -39,7 +39,7 @@ const LoginWithEmailAndPassword = async (req, res) => {
           console.log('Transfer to DetailsScreen');
           res.send({ success: false, userId: userRecord.user.uid, tranferTo: 'DetailsScreen'});
         }
-        else{
+        else if (havePreferences === '0'){
           console.log('Transfer to Preferences');
           res.send({ success: false, userId: userRecord.user.uid, tranferTo: 'Preferences'});
         }

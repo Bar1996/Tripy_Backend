@@ -30,8 +30,8 @@ POST  http://localhost:3000/login
 Content-Type: application/json
 
 {
-  "email": "Bar31616@gmail.com",
-  "password": "Bar1234567"
+  "email": "idoben98@gmail.com",
+  "password": "pass123456"
 }
 
 
@@ -52,25 +52,25 @@ Content-Type: application/json
   "place_id": "ChIJvY4MLQmjAhUR1sOGnGeGoj0"
 }
 
-### Fetch Place Details
+### Add Details
 POST http://localhost:3000/addDetails
 Content-Type: application/json
 
 {
-  "uid": "vZ24Kn8WLoVesI2c796ptTa5R2v2",
-  "name": "Bar Cohen",
+  "uid": "17PZMYPEGUTYjkXfBLwCP7KTaco1",
+  "name": "Bar Cohen Hagever",
   "birthday": "1996-03-14",
   "gender": "Male"
 }
 
 
-### Fetch Place Details
+### Add Preferences
 POST http://localhost:3000/addPreferences 
 Content-Type: application/json
 
 {
-  "uid": "vZ24Kn8WLoVesI2c796ptTa5R2v2",
-  "preferences": ["Ido", "Ha", "Zain"]
+  "uid": "17PZMYPEGUTYjkXfBLwCP7KTaco1",
+  "preferences": ["Ido", "Ha", "Zain", "Bar", "Cohen", "Hagever"]
 }
 
 
@@ -88,3 +88,51 @@ Content-Type: application/json
   "location": "Paris"
 }
 
+
+### Plan Vacation
+POST http://localhost:3000/addPlan 
+Content-Type: application/json
+
+{
+  "uid": "17PZMYPEGUTYjkXfBLwCP7KTaco1",
+  "destination": "Tel Aviv",
+  "arrivalDate": "2024-08-02",
+  "departureDate": "2024-08-05",
+  "social": "Solo"
+}
+
+
+
+### Get details
+GET http://localhost:3000/getDetails 
+Content-Type: application/json
+
+{
+  "uid": "17PZMYPEGUTYjkXfBLwCP7KTaco1"
+}
+
+
+### Get preferences
+GET http://localhost:3000/getPreferences
+Content-Type: application/json
+
+{
+  "uid": "17PZMYPEGUTYjkXfBLwCP7KTaco1"
+}
+
+
+### Get plans IDs
+GET http://localhost:3000/getUserPlanIds
+Content-Type: application/json
+
+{
+  "uid": "17PZMYPEGUTYjkXfBLwCP7KTaco1"
+}
+
+### Get plans by ID
+GET http://localhost:3000/getPlanById
+Content-Type: application/json
+
+{
+  "planId": "gwy0KADKthPO3fvnD6tT"
+}
