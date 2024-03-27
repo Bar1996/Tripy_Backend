@@ -30,8 +30,8 @@ POST  http://localhost:3000/login
 Content-Type: application/json
 
 {
-  "email": "idoben98@gmail.com",
-  "password": "pass123456"
+  "email": "bar31616@gmail.com",
+  "password": "Bar1234567"
 }
 
 
@@ -136,3 +136,9 @@ Content-Type: application/json
 {
   "planId": "gwy0KADKthPO3fvnD6tT"
 }
+
+### GET refresh
+POST http://localhost:3000/refresh
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIxN1BaTVlQRUdVVFlqa1hmQkx3Q1A3S1RhY28xIiwic2FsdCI6MC41MDIzNDIwODQ2MTE0Nzk0LCJpYXQiOjE3MTE1MzkwNzB9.j2KEEsMGgygWmgtAYTKOLK9SdBxwMHHER1vv8Gw7hws
+
