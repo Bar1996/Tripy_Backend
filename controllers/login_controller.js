@@ -20,8 +20,10 @@ const { checkEmailInUse } = require("../helpers/checkEmailInUse.js");
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const { OAuth2Client } = require('google-auth-library');
 
 let auth2 = getAuth();
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const LoginWithEmailAndPassword = async (req, res) => {
   const { email, password } = req.body;
@@ -36,8 +38,11 @@ const LoginWithEmailAndPassword = async (req, res) => {
     // Generate access and refresh tokens
     const { accessToken, refreshToken } = generateTokens(userRecord.user.uid);
 
+    console.log("Access Token:", jwt.decode(accessToken).uid);
+
     const usersQuery = query(collection(db, 'users'), where('uid', '==', userRecord.user.uid));
     const querySnapshot = await getDocs(usersQuery);
+
 
     if (querySnapshot.empty) {
       console.log("User not found in Firestore, considering adding a new document...");
@@ -150,6 +155,58 @@ const signInGoogle = async (req, res) => {
   }
 };
 
+const googleSignIn = async (req, res) => {
+  try {
+    console.log("Google sign in request received", req.body.credentialResponse);
+    console.log("Google client ID:", process.env.GOOGLE_CLIENT_ID);
+    const ticket = await client.verifyIdToken({
+      idToken: req.body.credentialResponse,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+
+    const payload = ticket.getPayload();
+    const email = payload?.email;
+
+    if (email) {
+      const usersCollection = collection(db, "users");
+      const userQuery = query(usersCollection, where("email", "==", email));
+      const userQuerySnapshot = await getDocs(userQuery);
+
+      let user;
+      if (userQuerySnapshot.empty) {
+        user = {
+          email: email,
+          imgUrl: payload?.picture,
+          name: payload?.name,
+          userType: "google",
+          tokens: []
+        };
+        const userDoc = await addDoc(usersCollection, user);
+        user._id = userDoc.id; // Set the user ID to the document ID
+      } else {
+        user = userQuerySnapshot.docs[0].data();
+        user._id = userQuerySnapshot.docs[0].id; // Get the document ID
+      }
+
+      const { accessToken, refreshToken } = generateTokens(user._id);
+
+      // Update the user's tokens in the database
+      await addDoc(usersCollection, user);
+
+      return res.status(200).send({
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        email: email,
+        _id: user._id,
+        imgUrl: user.imgUrl,
+        message: "Login successful"
+      });
+    }
+  } catch (error) {
+    return res.status(400).send(error.message);
+  }
+};
+
 const resetPassword = async (req, res) => {
   const { email } = req.body;
   auth2 = getAuth();
@@ -187,6 +244,7 @@ const resetPassword = async (req, res) => {
 
 const refresh = async (req, res) => {
   // Extract token from HTTP header
+  console.log("Refresh token request received");
   const authHeader = req.headers["authorization"];
   const refreshTokenOrig = authHeader && authHeader.split(" ")[1];
 
@@ -345,5 +403,6 @@ module.exports = {
   signInGoogle,
   resetPassword,
   Maps,
-  refresh
+  refresh,
+  googleSignIn,
 };
