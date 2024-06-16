@@ -5,7 +5,7 @@ const auth = require('../common/auth_middleware');
 
 router.post("/addPlan",auth, plans_controller.addPlan);
 router.get("/getUserPlanIds",auth, plans_controller.getUserPlanIds);
-router.get("/getPlanById",auth, plans_controller.getPlanById);
+router.post("/getPlanById", plans_controller.getPlanById);
 
 
 module.exports = router;
