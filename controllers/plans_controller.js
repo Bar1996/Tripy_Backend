@@ -10,13 +10,13 @@ const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
 const addPlan = async (req, res) => {
     try {
-        console.log('Request to add plan received');
-        if (!req.body.uid) {
-            res.status(400).send('uid is required');
-            return;
-        }
+        // console.log('Request to add plan received');
+        // if (!req.body.uid) {
+        //     res.status(400).send('uid is required');
+        //     return;
+        // }
 
-        const uid = req.body.uid; // Unique identifier for the user
+        const uid = req.body.user.uid; // Unique identifier for the user
         const destination = req.body.destination; // Destination from request body
         const arrivalDate = req.body.arrivalDate; // Arrival date from request body
         const departureDate = req.body.departureDate; // Departure date from request body
@@ -176,11 +176,11 @@ async function organizeData(response) {
 
   const getUserPlanIds = async (req, res) => {
     try {
-        if (!req.body.uid) {
-            return res.status(400).send('uid is required');
-        }
+        // if (!req.body.uid) {
+        //     return res.status(400).send('uid is required');
+        // }
 
-        const uid = req.body.uid;
+        const uid = req.body.user.uid;
 
         const userQuerySnapshot = await getDocs(query(collection(db, 'users'), where('uid', '==', uid)));
         if (userQuerySnapshot.empty) {
