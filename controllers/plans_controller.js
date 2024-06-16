@@ -201,7 +201,7 @@ async function organizeData(response) {
 
 const getPlanById = async (req, res) => {
     try {
-        const { planId } = req.body; // Assuming you use something like /plans/:planId
+        const { planId } = req.body.planId; 
 
         if (!planId) {
             return res.status(400).send('planId is required');
