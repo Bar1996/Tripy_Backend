@@ -8,12 +8,13 @@ const { db } = require('../firebaseConfig.js');
 const addDetails = async (req, res) => {
     try {
         // Check if userId exists in request body
-        if (!req.body.uid) {
-            res.status(400).send('uid is required');
-            return;
-        }
+        // if (!req.body.uid) {
+        //     res.status(400).send('uid is required');
+        //     return;
+        // }
 
-        const uid = req.body.uid; // Unique identifier for the user
+        console.log('user in add deatails:', req.body.user);
+        const uid = req.body.user; // Unique identifier for the user
         const name = req.body.name;
         const gender = req.body.gender;
         const dateString = req.body.birthday;
@@ -63,12 +64,14 @@ const addDetails = async (req, res) => {
 const addPreferences = async (req, res) => {
     try {
         // Check if userId exists in request body
-        if (!req.body.uid) {
-            res.status(400).send('uid is required');
-            return;
-        }
+        // if (!req.body.uid) {
+        //     res.status(400).send('uid is required');
+        //     return;
+        // }
 
-        const uid = req.body.uid; // Unique identifier for the user
+        console.log('user in add preferences:', req.body.user);
+
+        const uid = req.body.user; // Unique identifier for the user
         const preferences = req.body.preferences; // Get preferences from request body
         const havePreferences = '1';
 

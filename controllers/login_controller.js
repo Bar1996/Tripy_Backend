@@ -155,7 +155,7 @@ const signInGoogle = async (req, res) => {
   }
 };
 
-const googleSignIn = async (req, res) => {
+const googleSignIn = async (req, res) => { //TODO check the uid save in the database
   try {
     console.log("Google sign in request received", req.body.credentialResponse);
     console.log("Google client ID:", process.env.GOOGLE_CLIENT_ID);
