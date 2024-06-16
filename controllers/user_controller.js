@@ -13,8 +13,8 @@ const addDetails = async (req, res) => {
         //     return;
         // }
 
-        console.log('user in add deatails:', req.body.user);
-        const uid = req.body.user; // Unique identifier for the user
+        console.log('user in add deatails:', req.body.user.uid);
+        const uid = req.body.user.uid; // Unique identifier for the user
         const name = req.body.name;
         const gender = req.body.gender;
         const dateString = req.body.birthday;
@@ -69,9 +69,9 @@ const addPreferences = async (req, res) => {
         //     return;
         // }
 
-        console.log('user in add preferences:', req.body.user);
+        console.log('user in add preferences:', req.body.user.uid);
 
-        const uid = req.body.user; // Unique identifier for the user
+        const uid = req.body.user.uid; // Unique identifier for the user
         const preferences = req.body.preferences; // Get preferences from request body
         const havePreferences = '1';
 
