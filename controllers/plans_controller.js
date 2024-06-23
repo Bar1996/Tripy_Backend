@@ -15,8 +15,10 @@ const addPlan = async (req, res) => {
         //     res.status(400).send('uid is required');
         //     return;
         // }
+        console.log('user in plans:', req.body.user);
 
         const uid = req.body.user.uid; // Unique identifier for the user
+        console.log('uid in plans:', uid);
         const destination = req.body.destination; // Destination from request body
         const arrivalDate = req.body.arrivalDate; // Arrival date from request body
         const departureDate = req.body.departureDate; // Departure date from request body

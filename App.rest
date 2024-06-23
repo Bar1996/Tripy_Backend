@@ -57,7 +57,7 @@ POST http://localhost:3000/addDetails
 Content-Type: application/json
 
 {
-  "uid": "17PZMYPEGUTYjkXfBLwCP7KTaco1",
+  "uid": "my9F7d6oJvTRhYya3V9deg1H4752",
   "name": "Bar Cohen Hagever",
   "birthday": "1996-03-14",
   "gender": "Male"
@@ -130,15 +130,23 @@ Content-Type: application/json
 }
 
 ### Get plans by ID
-GET http://localhost:3000/getPlanById
+POST http://localhost:3000/getPlanById
 Content-Type: application/json
 
 {
-  "planId": "gwy0KADKthPO3fvnD6tT"
+  "planId": "AVz3Y0Ot836ZWOudjP0S"
 }
 
 ### GET refresh
 GET http://localhost:3000/refresh
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIxN1BaTVlQRUdVVFlqa1hmQkx3Q1A3S1RhY28xIiwic2FsdCI6MC4xMTg0NjQzOTEyNzY2Njc2NCwiaWF0IjoxNzExNTM5NjY0fQ.IIEpB6oSM7RLQjphPEl4UzYw-zndZPxOIImPxnTtIQE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIyMnpxY0x5bGs4V0pQeGJUZVFrS0QxRXJGOE0yIiwic2FsdCI6MC40NjgxMTg4NzMzNDg0OTExLCJpYXQiOjE3MTg2MjYwNTB9.Nyf75fnUKHaiHSQsqSEho1jm8B_ONoKDs96tyzfzFf4
 
+
+### post google login
+POST http://localhost:3000/googleSignIn
+Content-Type: application/json
+
+{
+  "credentialResponse": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjY3NGRiYmE4ZmFlZTY5YWNhZTFiYzFiZTE5MDQ1MzY3OGY0NzI4MDMiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI1NTE2MDczMTMyMzMtdjBqN2M0aGVrc2ZmODlwYmpwM212bHBncjB2ZnZkNGQuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI1NTE2MDczMTMyMzMtdTBpNGUxcTUwZmltYzB1a252MzJsNmJ2ODBnNjV0NTguYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTMwNjU0NDcwMjk0OTQ1MDU0MTkiLCJlbWFpbCI6ImJhcjM2NjhAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsIm5hbWUiOiJCYXIgQ29oZW4iLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jTFhtMm9lODNxUWJGYU5SMUxhQlFWYms2NkJJWC12cEZMMTktX2lCc3k2dGwwdGpRPXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkJhciIsImZhbWlseV9uYW1lIjoiQ29oZW4iLCJpYXQiOjE3MTc0MjUyMjAsImV4cCI6MTcxNzQyODgyMH0.uD53eaQpsHk6X6EpariCjf6OG0PGd9Gwz2JmSp_ZAV_JsYzMeFUJicQ7w3c09WFJg2p3pbUXIbHE-w-N0rCPh4MpzSGGvrMJqMBRqnUChupvS5zcJxbrtdaUrKsg1BP4mzk9yRYSalRBK3JPl0KhxJgJ0r_ym2oyiZPVU7Z1O5TBRbmtZxJPctWGvrCoZoRP_N78PTTpwRs8663pvdnTvJf5kfC-tt7s_xT951jRepi0Kh-8Nkn2oEXuihZzC4N3ntXLgIu1oTxcgR4zhIaKW0u21bdcTOu0WzqubWKvgazlK67ys7YNMfrLL9gPW_zJoS2yXrcLqd9TggGqoVyVag"
+}
