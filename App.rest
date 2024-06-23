@@ -154,9 +154,9 @@ Content-Type: application/json
 
 ### delete plan
 
-DELETE http://localhost:3000/deletePlan
+POST  http://localhost:3000/deletePlan
 Content-Type: application/json
 
 {
-  "planId": "fu1QpaXD22gmzgV8aNZw"
+  "planId": "GFG0ulbvLxZQhBV9RTGr"
 }
