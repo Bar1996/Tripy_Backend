@@ -426,4 +426,77 @@ async function getActivityNameFromPlaceId(placeId) {
   }
 }
 
-module.exports = { addPlan, getUserPlanIds, getPlanById, deletePlan, editActivity };
+
+const replaceActivity = async (req, res) => {
+  try {
+    const planId = req.body.planId;
+    const dayIndex = req.body.dayIndex;
+    const activityIndex = req.body.activityIndex;
+    const newActivityName = req.body.newActivity;
+    console.log("planId: ", planId);
+    console.log("dayIndex: ", dayIndex);
+    console.log("activityIndex: ", activityIndex);
+    console.log("newActivityName: ", newActivityName);
+
+    if (!planId || dayIndex === undefined || activityIndex === undefined || !newActivityName) {
+      return res.status(400).send("planId, dayIndex, activityIndex, and newActivityName are required");
+    }
+
+    const planDoc = await getDoc(doc(db, "plans", planId));
+    if (!planDoc.exists()) {
+      return res.status(404).send("Plan not found");
+    }
+
+    const planData = planDoc.data();
+    console.log("planData: ", planData);
+
+    const travelPlan = planData.travelPlan;
+    if (!travelPlan[dayIndex]) {
+      return res.status(404).send("Day not found in travel plan");
+    }
+
+    if (!travelPlan[dayIndex].activities || !travelPlan[dayIndex].activities[activityIndex]) {
+      return res.status(404).send("Activity not found in travel plan");
+    }
+
+    // Replace the old activity with the new one
+    console.log("Before: ", travelPlan[dayIndex].activities[activityIndex]);
+    travelPlan[dayIndex].activities[activityIndex] = newActivityName;
+    console.log("After: ", travelPlan);
+    
+
+    // Update the plan in the database
+    await updateDoc(doc(db, "plans", planId), { travelPlan });
+
+    res.status(200).send("Activity replaced successfully");
+  } catch (error) {
+    console.error("Error replacing activity:", error);
+    res.status(500).send("Error replacing activity");
+  }
+};
+
+async function getActivityPlaceId(activityName, destination) {
+  const query = `${activityName} in ${destination}`;
+  const apiUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
+    query
+  )}&key=${apiKey}`;
+  try {
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    if (data.results && data.results.length > 0) {
+      return data.results[0].place_id;
+    } else {
+      console.error(
+        `No place found for activity: ${activityName} in destination: ${destination}`
+      );
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching activity place ID:", error);
+    return null;
+  }
+}
+
+module.exports = { addPlan, getUserPlanIds, getPlanById, deletePlan, editActivity, replaceActivity };
+
+

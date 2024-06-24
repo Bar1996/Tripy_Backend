@@ -168,6 +168,19 @@ Content-Type: application/json
 
 {
   "planId": "4yaBGWMI4MYgJvB37C77",
-  "day": "2",
+  "day": "0",
   "activity": "0"
+}
+
+
+### editActivity
+
+POST http://localhost:3000/replaceActivity
+Content-Type: application/json
+
+{
+  "planId": "4yaBGWMI4MYgJvB37C77",
+  "dayIndex": "0",
+  "activityIndex": "1",
+  "newActivity": "ChIJc2nSALkEdkgRkuoJJBfzkUI"
 }
