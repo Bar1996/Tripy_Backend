@@ -297,4 +297,133 @@ const deletePlan = async (req, res) => {
   }
 };
 
-module.exports = { addPlan, getUserPlanIds, getPlanById, deletePlan };
+
+
+const editActivity = async (req, res) => {
+  try {
+    const planId = req.body.planId;
+    const day = req.body.day;
+    const activity = req.body.activity;
+    console.log("planId: ", planId);
+    console.log("day: ", day);
+    console.log("activity: ", activity);
+
+    if (!planId || !day || !activity) {
+      return res.status(400).send("planId, day, and activity are required");
+    }
+
+    const planDoc = await getDoc(doc(db, "plans", planId));
+    if (!planDoc.exists()) {
+      return res.status(404).send("Plan not found");
+    }
+
+    const planData = planDoc.data();
+    console.log("planData: ", planData);
+
+    // Find the user with the correct query
+    const usersCollection = collection(db, "users");
+    const userQuery = query(usersCollection, where("uid", "==", planData.uid));
+    const userQuerySnapshot = await getDocs(userQuery);
+
+    if (userQuerySnapshot.empty) {
+      return res.status(404).send("User not found");
+    }
+
+    const userDoc = userQuerySnapshot.docs[0];
+    const userData = userDoc.data();
+    const preferencesDoc = await getDoc(doc(db, "preferences", userData.preferences_uid));
+    if (!preferencesDoc.exists()) {
+      return res.status(404).send("Preferences not found");
+    }
+
+    const preferencesData = preferencesDoc.data();
+
+    const activities = planData.travelPlan[day].activities;
+    console.log("activities: ", activities);
+    activities.push(activity);
+
+    // Gather all activities in the plan to avoid duplicates
+    const allActivities = planData.travelPlan.flatMap(dayPlan => dayPlan.activities);
+    console.log("All activities in the plan: ", allActivities);
+
+    // Convert place IDs to place names using Google Maps API
+    const allActivityNames = await Promise.all(
+      allActivities.map(async (placeId) => {
+        try {
+          const placeDetails = await getActivityNameFromPlaceId(placeId);
+          return placeDetails.name;
+        } catch (err) {
+          console.error(`Error fetching place name for place ID ${placeId}: `, err);
+          return null;
+        }
+      })
+    );
+
+    const filteredActivityNames = allActivityNames.filter(name => name !== null);
+    console.log("All activity names in the plan: ", filteredActivityNames);
+
+    // Generate 3 additional suitable activities
+    const prompt = `I am editing an activity for a user. The user's preferences are: ${JSON.stringify(preferencesData.preferences)}.
+    The current activities for the day are: ${activities.join(", ")}. The destination is ${planData.destination}.
+    The existing activities in the plan are: ${filteredActivityNames.join(", ")}.
+    Please suggest 3 additional activities that are suitable considering the user's preferences and the current activities.
+    The format should be a JSON array of activity names.`;
+
+    console.log("Generated prompt for Gemini: ", prompt);
+
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = await response.text();
+
+    console.log("Gemini response text: ", text);
+
+    // Extract JSON array from the response text
+    const startIndex = text.indexOf('[');
+    const endIndex = text.lastIndexOf(']') + 1;
+    if (startIndex === -1 || endIndex === -1) {
+      throw new Error("Valid JSON array not found in response");
+    }
+    const jsonResponse = text.substring(startIndex, endIndex);
+
+    const additionalActivities = JSON.parse(jsonResponse);
+
+    console.log("Additional activities: ", additionalActivities);
+
+    // Fetch place IDs for the new activities
+    const newActivitiesWithPlaceIds = await Promise.all(
+      additionalActivities.map(async (activity) => {
+        try {
+          return await getActivityPlaceId(activity, planData.destination);
+        } catch (err) {
+          console.error(`Error fetching place ID for activity ${activity}: `, err);
+          return null;
+        }
+      })
+    );
+
+    const filteredNewActivities = newActivitiesWithPlaceIds.filter(
+      (id) => id !== null && !allActivities.includes(id)
+    );
+
+    console.log("Filtered new activities with place IDs: ", filteredNewActivities);
+
+    res.status(200).json({ additionalActivities: filteredNewActivities });
+  } catch (error) {
+    console.error("Error editing activity:", error);
+    res.status(500).send("Error editing activity");
+  }
+};
+
+async function getActivityNameFromPlaceId(placeId) {
+  const apiUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${apiKey}`;
+  const response = await fetch(apiUrl);
+  const data = await response.json();
+  if (data.result && data.result.name) {
+    return { name: data.result.name };
+  } else {
+    throw new Error(`No place found for place ID: ${placeId}`);
+  }
+}
+
+module.exports = { addPlan, getUserPlanIds, getPlanById, deletePlan, editActivity };

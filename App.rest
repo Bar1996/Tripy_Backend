@@ -160,3 +160,14 @@ Content-Type: application/json
 {
   "planId": "GFG0ulbvLxZQhBV9RTGr"
 }
+
+### editActivity
+
+POST http://localhost:3000/editActivity
+Content-Type: application/json
+
+{
+  "planId": "4yaBGWMI4MYgJvB37C77",
+  "day": "2",
+  "activity": "0"
+}
