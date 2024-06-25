@@ -110,12 +110,12 @@ const addPreferences = async (req, res) => {
 const getDetails = async (req, res) => {
     try {
         // Check if userId exists in request body
-        if (!req.body.uid) {
-            res.status(400).send('uid is required');
-            return;
-        }
+        // if (!req.body.uid) {
+        //     res.status(400).send('uid is required');
+        //     return;
+        // }
 
-        const uid = req.body.uid; // Unique identifier for the user
+        const uid = req.body.user.uid; // Unique identifier for the user
 
         // Check if user exists in 'users' collection
         const userQuerySnapshot = await getDocs(query(collection(db, 'users'), where('uid', '==', uid)));
@@ -143,12 +143,12 @@ const getDetails = async (req, res) => {
 const getPreferences = async (req, res) => {
     try {
         // Check if userId exists in request body
-        if (!req.body.uid) {
-            res.status(400).send('uid is required');
-            return;
-        }
+        // if (!req.body.uid) {
+        //     res.status(400).send('uid is required');
+        //     return;
+        // }
 
-        const uid = req.body.uid; // Unique identifier for the user
+        const uid = req.body.user.uid; // Unique identifier for the user
 
         // Check if user exists in 'users' collection and has a preferences_uid
         const userQuerySnapshot = await getDocs(query(collection(db, 'users'), where('uid', '==', uid)));
