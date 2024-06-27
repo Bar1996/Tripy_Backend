@@ -2,6 +2,7 @@ const { getAuth, createUserWithEmailAndPassword, sendEmailVerification } = requi
 const {collection, addDoc, updateDoc, getDocs, doc, query, where, getDoc} = require('firebase/firestore');
 const admin = require('firebase-admin');
 const { db } = require('../firebaseConfig.js');
+const jwt = require("jsonwebtoken");
 
 
 
@@ -192,4 +193,42 @@ const CheckAuth = async (req, res) => {
 }
 
 
-module.exports = {addDetails, addPreferences, getDetails, getPreferences, CheckAuth};
+const logout = async (req, res) => {
+    console.log("logout");
+    const authHeader = req.headers['authorization'];
+    const accessToken = authHeader && authHeader.split(' ')[1];
+  
+    if (accessToken == null) {
+      return res.status(401).send("missing token");
+    }
+  
+    jwt.verify(accessToken, process.env.TOKEN_SECRET, async (err, userInfo) => {
+      if (err) {
+        return res.status(403).send("invalid token");
+      }
+  
+      try {
+        // Find the user in Firestore
+        const userQuerySnapshot = await getDocs(query(collection(db, 'users'), where('uid', '==', userInfo.uid)));
+        if (userQuerySnapshot.empty) {
+          return res.status(404).send("not found");
+        }
+  
+        const userDoc = userQuerySnapshot.docs[0];
+        const userRef = doc(db, 'users', userDoc.id);
+  
+        // Clear tokens or relevant session fields
+        await updateDoc(userRef, { tokens: [] });
+  
+        return res.status(200).send("logout successful");
+      } catch (error) {
+        console.error('Error during logout:', error);
+        return res.status(500).send(error.message);
+      }
+    });
+  };
+
+
+
+
+module.exports = {addDetails, addPreferences, getDetails, getPreferences, CheckAuth, logout};
