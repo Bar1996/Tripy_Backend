@@ -184,5 +184,12 @@ const getPreferences = async (req, res) => {
     }
 }
 
+const CheckAuth = async (req, res) => {
+    console.log("Checking token validity"); // Check if this gets printed
+    res.status(200).json({
+        message: "Authenticated",
+    });
+}
 
-module.exports = {addDetails, addPreferences, getDetails, getPreferences};
+
+module.exports = {addDetails, addPreferences, getDetails, getPreferences, CheckAuth};
