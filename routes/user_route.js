@@ -8,6 +8,6 @@ router.post("/addDetails", auth,  user_controller.addDetails);
 router.post("/addPreferences", auth, user_controller.addPreferences);
 router.get("/getDetails",auth, user_controller.getDetails);
 router.get("/getPreferences",auth, user_controller.getPreferences);
-router.put("/check",auth, user_controller.CheckAuth);
+router.get("/check",auth, user_controller.CheckAuth);
 
 module.exports = router;
