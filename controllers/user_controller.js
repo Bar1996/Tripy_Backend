@@ -130,7 +130,8 @@ const getDetails = async (req, res) => {
             name: userData.name,
             gender: userData.gender,
             dateOfBirth: userData.dateOfBirth,
-            email: userData.email
+            email: userData.email,
+            userType: userData.userType,
         };
 
         res.status(200).send(details);
