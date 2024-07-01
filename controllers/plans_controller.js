@@ -497,6 +497,53 @@ async function getActivityPlaceId(activityName, destination) {
   }
 }
 
-module.exports = { addPlan, getUserPlanIds, getPlanById, deletePlan, editActivity, replaceActivity };
+//delete activity
+const deleteActivity = async (req, res) => {
+  try {
+    const planId = req.body.planId;
+    const dayIndex = req.body.dayIndex;
+    const activityIndex = req.body.activityIndex;
+    console.log("planId: ", planId);
+    console.log("dayIndex: ", dayIndex);
+    console.log("activityIndex: ", activityIndex);
+
+    if (!planId || dayIndex === undefined || activityIndex === undefined) {
+      return res.status(400).send("planId, dayIndex, and activityIndex are required");
+    }
+
+    const planDoc = await getDoc(doc(db, "plans", planId));
+    if (!planDoc.exists()) {
+      return res.status(404).send("Plan not found");
+    }
+
+    const planData = planDoc.data();
+    console.log("planData: ", planData);
+
+    const travelPlan = planData.travelPlan;
+    if (!travelPlan[dayIndex]) {
+      return res.status(404).send("Day not found in travel plan");
+    }
+
+    if (!travelPlan[dayIndex].activities || !travelPlan[dayIndex].activities[activityIndex]) {
+      return res.status(404).send("Activity not found in travel plan");
+    }
+
+    // Delete the activity from the travel plan
+    console.log("Before: ", travelPlan[dayIndex].activities);
+    travelPlan[dayIndex].activities.splice(activityIndex, 1);
+    console.log("After: ", travelPlan);
+
+    // Update the plan in the database
+    await updateDoc(doc(db, "plans", planId), { travelPlan });
+
+    res.status(200).send("Activity deleted successfully");
+  } catch (error) {
+    console.error("Error deleting activity:", error);
+    res.status(500).send("Error deleting activity");
+  }
+
+}
+
+module.exports = { addPlan, getUserPlanIds, getPlanById, deletePlan, editActivity, replaceActivity, deleteActivity };
 
 

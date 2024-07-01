@@ -9,6 +9,7 @@ router.post("/getPlanById",auth, plans_controller.getPlanById);
 router.post("/deletePlan",auth, plans_controller.deletePlan);
 router.post("/editActivity",auth, plans_controller.editActivity);
 router.post("/replaceActivity",auth, plans_controller.replaceActivity);
+router.post("/deleteActivity",auth, plans_controller.deleteActivity);
 
 
 module.exports = router;

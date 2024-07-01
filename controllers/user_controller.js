@@ -8,11 +8,7 @@ const jwt = require("jsonwebtoken");
 
 const addDetails = async (req, res) => {
     try {
-        // Check if userId exists in request body
-        // if (!req.body.uid) {
-        //     res.status(400).send('uid is required');
-        //     return;
-        // }
+  
 
         console.log('user in add deatails:', req.body.user.uid);
         const uid = req.body.user.uid; // Unique identifier for the user
@@ -64,11 +60,7 @@ const addDetails = async (req, res) => {
 
 const addPreferences = async (req, res) => {
     try {
-        // Check if userId exists in request body
-        // if (!req.body.uid) {
-        //     res.status(400).send('uid is required');
-        //     return;
-        // }
+  
 
         console.log('user in add preferences:', req.body.user.uid);
 
@@ -110,11 +102,7 @@ const addPreferences = async (req, res) => {
 
 const getDetails = async (req, res) => {
     try {
-        // Check if userId exists in request body
-        // if (!req.body.uid) {
-        //     res.status(400).send('uid is required');
-        //     return;
-        // }
+      
 
         const uid = req.body.user.uid; // Unique identifier for the user
 
@@ -144,11 +132,7 @@ const getDetails = async (req, res) => {
 
 const getPreferences = async (req, res) => {
     try {
-        // Check if userId exists in request body
-        // if (!req.body.uid) {
-        //     res.status(400).send('uid is required');
-        //     return;
-        // }
+
 
         const uid = req.body.user.uid; // Unique identifier for the user
 

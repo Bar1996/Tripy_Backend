@@ -184,3 +184,15 @@ Content-Type: application/json
   "activityIndex": "1",
   "newActivity": "ChIJc2nSALkEdkgRkuoJJBfzkUI"
 }
+
+
+### editActivity
+
+POST http://localhost:3000/delete
+Content-Type: application/json
+
+{
+  "planId": "mM27GpY50jzDQuvVaXkw",
+  "dayIndex": "0",
+  "activityIndex": "0"
+}
