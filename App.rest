@@ -196,3 +196,30 @@ Content-Type: application/json
   "dayIndex": "0",
   "activityIndex": "0"
 }
+
+
+### FindRestaurantNearBy
+
+POST http://localhost:3000/FindRestaurantNearBy
+Content-Type: application/json
+
+{
+  "planId": "nhXtusi9N3T0t97RGOQA",
+  "day": "0",
+  "activity": "1",
+  "mealType": "Lunch"
+}
+
+
+### addRestaurantToPlan
+
+POST http://localhost:3000/addRestaurantToPlan
+Content-Type: application/json
+
+{
+  "planId": "nhXtusi9N3T0t97RGOQA",
+  "dayIndex": "0",
+  "activityIndex": "0",
+  "restaurantName": "La Pepica",
+  "placeId": "ChIJPzfTZOXnYQ0RJR4ZLpGGvIo"
+}

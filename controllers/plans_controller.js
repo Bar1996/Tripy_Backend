@@ -27,10 +27,10 @@ const addPlan = async (req, res) => {
     //     res.status(400).send('uid is required');
     //     return;
     // }
-    console.log('user in plans:', req.body.user);
+    console.log("user in plans:", req.body.user);
 
     const uid = req.body.user.uid; // Unique identifier for the user
-    console.log('uid in plans:', uid);
+    console.log("uid in plans:", uid);
     const destination = req.body.destination; // Destination from request body
     const arrivalDate = req.body.arrivalDate; // Arrival date from request body
     const departureDate = req.body.departureDate; // Departure date from request body
@@ -257,7 +257,7 @@ const deletePlan = async (req, res) => {
     }
 
     const planDoc = await getDoc(doc(db, "plans", planId));
-    
+
     if (!planDoc.exists()) {
       return res.status(404).send("Plan not found");
     }
@@ -271,12 +271,12 @@ const deletePlan = async (req, res) => {
 
     // Delete plan from the "plans" collection
     await deleteDoc(doc(db, "plans", planId));
-    
+
     // Query the users collection to find the document with the given uid
     const usersCollection = collection(db, "users");
     const userQuery = query(usersCollection, where("uid", "==", uid));
     const userQuerySnapshot = await getDocs(userQuery);
-    
+
     if (userQuerySnapshot.empty) {
       console.error(`User document not found for uid: ${uid}`);
       return res.status(404).send("User document not found");
@@ -287,7 +287,7 @@ const deletePlan = async (req, res) => {
 
     // Remove the planId from the user's plans array in the user collection
     await updateDoc(userDocRef, {
-      plans: arrayRemove(planId)
+      plans: arrayRemove(planId),
     });
 
     res.status(200).send("Plan deleted successfully");
@@ -296,8 +296,6 @@ const deletePlan = async (req, res) => {
     res.status(500).send("Error deleting plan");
   }
 };
-
-
 
 const editActivity = async (req, res) => {
   try {
@@ -331,7 +329,9 @@ const editActivity = async (req, res) => {
 
     const userDoc = userQuerySnapshot.docs[0];
     const userData = userDoc.data();
-    const preferencesDoc = await getDoc(doc(db, "preferences", userData.preferences_uid));
+    const preferencesDoc = await getDoc(
+      doc(db, "preferences", userData.preferences_uid)
+    );
     if (!preferencesDoc.exists()) {
       return res.status(404).send("Preferences not found");
     }
@@ -343,7 +343,9 @@ const editActivity = async (req, res) => {
     activities.push(activity);
 
     // Gather all activities in the plan to avoid duplicates
-    const allActivities = planData.travelPlan.flatMap(dayPlan => dayPlan.activities);
+    const allActivities = planData.travelPlan.flatMap(
+      (dayPlan) => dayPlan.activities
+    );
     console.log("All activities in the plan: ", allActivities);
 
     // Convert place IDs to place names using Google Maps API
@@ -353,19 +355,30 @@ const editActivity = async (req, res) => {
           const placeDetails = await getActivityNameFromPlaceId(placeId);
           return placeDetails.name;
         } catch (err) {
-          console.error(`Error fetching place name for place ID ${placeId}: `, err);
+          console.error(
+            `Error fetching place name for place ID ${placeId}: `,
+            err
+          );
           return null;
         }
       })
     );
 
-    const filteredActivityNames = allActivityNames.filter(name => name !== null);
+    const filteredActivityNames = allActivityNames.filter(
+      (name) => name !== null
+    );
     console.log("All activity names in the plan: ", filteredActivityNames);
 
     // Generate 3 additional suitable activities
-    const prompt = `I am editing an activity for a user. The user's preferences are: ${JSON.stringify(preferencesData.preferences)}.
-    The current activities for the day are: ${activities.join(", ")}. The destination is ${planData.destination}.
-    The existing activities in the plan are: ${filteredActivityNames.join(", ")}.
+    const prompt = `I am editing an activity for a user. The user's preferences are: ${JSON.stringify(
+      preferencesData.preferences
+    )}.
+    The current activities for the day are: ${activities.join(
+      ", "
+    )}. The destination is ${planData.destination}.
+    The existing activities in the plan are: ${filteredActivityNames.join(
+      ", "
+    )}.
     Please suggest 3 additional activities that are suitable considering the user's preferences and the current activities.
     The format should be a JSON array of activity names.`;
 
@@ -379,8 +392,8 @@ const editActivity = async (req, res) => {
     console.log("Gemini response text: ", text);
 
     // Extract JSON array from the response text
-    const startIndex = text.indexOf('[');
-    const endIndex = text.lastIndexOf(']') + 1;
+    const startIndex = text.indexOf("[");
+    const endIndex = text.lastIndexOf("]") + 1;
     if (startIndex === -1 || endIndex === -1) {
       throw new Error("Valid JSON array not found in response");
     }
@@ -396,7 +409,10 @@ const editActivity = async (req, res) => {
         try {
           return await getActivityPlaceId(activity, planData.destination);
         } catch (err) {
-          console.error(`Error fetching place ID for activity ${activity}: `, err);
+          console.error(
+            `Error fetching place ID for activity ${activity}: `,
+            err
+          );
           return null;
         }
       })
@@ -406,7 +422,10 @@ const editActivity = async (req, res) => {
       (id) => id !== null && !allActivities.includes(id)
     );
 
-    console.log("Filtered new activities with place IDs: ", filteredNewActivities);
+    console.log(
+      "Filtered new activities with place IDs: ",
+      filteredNewActivities
+    );
 
     res.status(200).json({ additionalActivities: filteredNewActivities });
   } catch (error) {
@@ -426,7 +445,6 @@ async function getActivityNameFromPlaceId(placeId) {
   }
 }
 
-
 const replaceActivity = async (req, res) => {
   try {
     const planId = req.body.planId;
@@ -438,8 +456,17 @@ const replaceActivity = async (req, res) => {
     console.log("activityIndex: ", activityIndex);
     console.log("newActivityName: ", newActivityName);
 
-    if (!planId || dayIndex === undefined || activityIndex === undefined || !newActivityName) {
-      return res.status(400).send("planId, dayIndex, activityIndex, and newActivityName are required");
+    if (
+      !planId ||
+      dayIndex === undefined ||
+      activityIndex === undefined ||
+      !newActivityName
+    ) {
+      return res
+        .status(400)
+        .send(
+          "planId, dayIndex, activityIndex, and newActivityName are required"
+        );
     }
 
     const planDoc = await getDoc(doc(db, "plans", planId));
@@ -455,7 +482,10 @@ const replaceActivity = async (req, res) => {
       return res.status(404).send("Day not found in travel plan");
     }
 
-    if (!travelPlan[dayIndex].activities || !travelPlan[dayIndex].activities[activityIndex]) {
+    if (
+      !travelPlan[dayIndex].activities ||
+      !travelPlan[dayIndex].activities[activityIndex]
+    ) {
       return res.status(404).send("Activity not found in travel plan");
     }
 
@@ -463,7 +493,6 @@ const replaceActivity = async (req, res) => {
     console.log("Before: ", travelPlan[dayIndex].activities[activityIndex]);
     travelPlan[dayIndex].activities[activityIndex] = newActivityName;
     console.log("After: ", travelPlan);
-    
 
     // Update the plan in the database
     await updateDoc(doc(db, "plans", planId), { travelPlan });
@@ -508,7 +537,9 @@ const deleteActivity = async (req, res) => {
     console.log("activityIndex: ", activityIndex);
 
     if (!planId || dayIndex === undefined || activityIndex === undefined) {
-      return res.status(400).send("planId, dayIndex, and activityIndex are required");
+      return res
+        .status(400)
+        .send("planId, dayIndex, and activityIndex are required");
     }
 
     const planDoc = await getDoc(doc(db, "plans", planId));
@@ -524,7 +555,10 @@ const deleteActivity = async (req, res) => {
       return res.status(404).send("Day not found in travel plan");
     }
 
-    if (!travelPlan[dayIndex].activities || !travelPlan[dayIndex].activities[activityIndex]) {
+    if (
+      !travelPlan[dayIndex].activities ||
+      !travelPlan[dayIndex].activities[activityIndex]
+    ) {
       return res.status(404).send("Activity not found in travel plan");
     }
 
@@ -541,9 +575,162 @@ const deleteActivity = async (req, res) => {
     console.error("Error deleting activity:", error);
     res.status(500).send("Error deleting activity");
   }
+};
 
-}
+const FindRestaurantNearBy = async (req, res) => {
+  try {
+    const { planId, day, activity, mealType } = req.body;
 
-module.exports = { addPlan, getUserPlanIds, getPlanById, deletePlan, editActivity, replaceActivity, deleteActivity };
+    if (!planId || !day || !activity || !mealType) {
+      return res
+        .status(400)
+        .send("planId, day, activity, and mealType are required");
+    }
+
+    const planDoc = await getDoc(doc(db, "plans", planId));
+    if (!planDoc.exists()) {
+      return res.status(404).send("Plan not found");
+    }
+
+    const planData = planDoc.data();
+    const travelPlan = planData.travelPlan;
+
+    if (!travelPlan[day]) {
+      return res.status(404).send("Day not found in travel plan");
+    }
+
+    if (!travelPlan[day].activities || !travelPlan[day].activities[activity]) {
+      return res.status(404).send("Activity not found in travel plan");
+    }
+
+    const activityLocation = travelPlan[day].activities[activity].location;
+
+    // Find the next activity (if exists) and get its location
+    const activities = Object.keys(travelPlan[day].activities);
+    const currentActivityIndex = activities.indexOf(activity);
+    let nextActivityLocation = null;
+
+    if (
+      currentActivityIndex !== -1 &&
+      currentActivityIndex < activities.length - 1
+    ) {
+      const nextActivity = activities[currentActivityIndex + 1];
+      nextActivityLocation = travelPlan[day].activities[nextActivity].location;
+    }
+
+    // Generate a restaurant suggestion using Gemini
+    const prompt = `I am finding 3 restaurants near ${activity} for a user (Max of 25 minutes of walk). The destination is ${
+      planData.destination
+    }. The meal type is ${mealType}. 
+    Please suggest 3 restaurants that are suitable considering the activity location ${activityLocation}${
+      nextActivityLocation
+        ? ` and the next activity location ${nextActivityLocation}`
+        : ""
+    }. 
+    Please give restaurants with high rating.
+    The format should be a JSON array of restaurant names.`;
+
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = await response.text();
+
+    console.log("Gemini response text: ", text);
+
+    // Extract JSON array from the response text
+    const startIndex = text.indexOf("[");
+    const endIndex = text.lastIndexOf("]") + 1;
+    if (startIndex === -1 || endIndex === -1) {
+      throw new Error("Valid JSON array not found in response");
+    }
+    const jsonResponse = text.substring(startIndex, endIndex);
+
+    const restaurantNames = JSON.parse(jsonResponse);
+
+    console.log("Restaurant names: ", restaurantNames);
+
+    // Fetch place IDs for the restaurant names
+    const restaurantsWithPlaceIds = await Promise.all(
+      restaurantNames.map(async (restaurantName) => {
+        try {
+          const placeId = await getActivityPlaceId(restaurantName, planData.destination);
+          return placeId ? { name: restaurantName, placeId } : null;
+        } catch (err) {
+          console.error(`Error fetching place ID for restaurant ${restaurantName}: `, err);
+          return null;
+        }
+      })
+    );
+
+    const validRestaurants = restaurantsWithPlaceIds.filter((restaurant) => restaurant !== null);
+
+    console.log("Restaurants with place IDs: ", validRestaurants);
+
+    res.status(200).json(validRestaurants);
+  } catch (error) {
+    console.error("Error in FindRestaurantNearBy:", error.message);
+    console.error(error.stack);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+
+// Add the Restaurant that the user pick to the activities
+const addRestaurantToPlan = async (req, res) => {
+  try {
+    const { planId, dayIndex, activityIndex, restaurantName, placeId } = req.body;
+
+    if (!planId || dayIndex === undefined || activityIndex === undefined || !restaurantName || !placeId) {
+      return res.status(400).send(
+        "planId, dayIndex, activityIndex, restaurantName, and placeId are required"
+      );
+    }
+
+    const planDoc = await getDoc(doc(db, "plans", planId));
+    if (!planDoc.exists()) {
+      return res.status(404).send("Plan not found");
+    }
+
+    const planData = planDoc.data();
+    const travelPlan = planData.travelPlan;
+
+    console.log("Received travelPlan: ", travelPlan);
+    console.log("Looking for day index: ", dayIndex);
+
+    if (!travelPlan[dayIndex]) {
+      console.log(`Day index "${dayIndex}" not found in travel plan`);
+      return res.status(404).send("Day not found in travel plan");
+    }
+
+    if (!travelPlan[dayIndex].activities || travelPlan[dayIndex].activities[activityIndex] === undefined) {
+      return res.status(404).send("Activity not found in travel plan");
+    }
+
+    // Insert the restaurant place ID after the specified activity index
+    travelPlan[dayIndex].activities.splice(activityIndex + 1, 0, placeId);
+
+    console.log("Updated travelPlan after adding restaurant: ", travelPlan);
+
+    // Update the plan in the database
+    await updateDoc(doc(db, "plans", planId), { travelPlan });
+
+    res.status(200).send("Restaurant added to plan successfully");
+  } catch (error) {
+    console.error("Error in addRestaurantToPlan:", error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+module.exports = {
+  addPlan,
+  getUserPlanIds,
+  getPlanById,
+  deletePlan,
+  editActivity,
+  replaceActivity,
+  deleteActivity,
+  FindRestaurantNearBy,
+  addRestaurantToPlan,
+};
 
 
