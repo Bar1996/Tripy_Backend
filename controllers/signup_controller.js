@@ -108,10 +108,16 @@ const PostPassword = async (req, res) => {
     console.log(password);
 };
 
+const wake = async (req, res) => {
+    console.log('Serevr is on');
+    res.send('awake');
+};
+
 
 
 module.exports = { 
     SignUpWithEmailAndPassword,
     PostEmail,
-    PostPassword
+    PostPassword,
+    wake
 };

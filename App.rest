@@ -167,7 +167,7 @@ POST http://localhost:3000/editActivity
 Content-Type: application/json
 
 {
-  "planId": "4yaBGWMI4MYgJvB37C77",
+  "planId": "nhXtusi9N3T0t97RGOQA",
   "day": "0",
   "activity": "0"
 }
@@ -207,7 +207,7 @@ Content-Type: application/json
   "planId": "nhXtusi9N3T0t97RGOQA",
   "day": "0",
   "activity": "1",
-  "mealType": "Lunch"
+  "mealType": "lunch"
 }
 
 
@@ -219,7 +219,7 @@ Content-Type: application/json
 {
   "planId": "nhXtusi9N3T0t97RGOQA",
   "dayIndex": "0",
-  "activityIndex": "0",
+  "activityIndex": "3",
   "restaurantName": "La Pepica",
   "placeId": "ChIJPzfTZOXnYQ0RJR4ZLpGGvIo"
 }
