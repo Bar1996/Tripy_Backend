@@ -114,13 +114,13 @@ const generatePlan = async ({
   
   let numberOfActivities;
   switch (loadLevel) {
-    case '2':
+    case 2:
       numberOfActivities = 2;
       break;
-    case '3':
+    case 3:
       numberOfActivities = 3;
       break;
-    case '4':
+    case 4:
       numberOfActivities = 4;
       break;
     default:

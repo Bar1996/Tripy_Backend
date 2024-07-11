@@ -95,11 +95,11 @@ Content-Type: application/json
 
 {
   "uid": "L5atNw823IaCWsyMICCLRlhleUM2",
-  "destination": "Valencia",
+  "destination": "Tel Aviv",
   "arrivalDate": "2024-08-04",
   "departureDate": "2024-08-06",
   "social": "Friends",
-  "loadLevel": "4"
+  "loadLevel": 2
 }
 
 
