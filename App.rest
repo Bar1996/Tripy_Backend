@@ -94,11 +94,12 @@ POST http://localhost:3000/addPlan
 Content-Type: application/json
 
 {
-  "uid": "M15VTbq37zV04kyD9yue8JVKNDm2",
-  "destination": "Ashdod",
-  "arrivalDate": "2024-05-04",
-  "departureDate": "2024-05-08",
-  "social": "Friends"
+  "uid": "L5atNw823IaCWsyMICCLRlhleUM2",
+  "destination": "Valencia",
+  "arrivalDate": "2024-08-04",
+  "departureDate": "2024-08-06",
+  "social": "Friends",
+  "loadLevel": "4"
 }
 
 

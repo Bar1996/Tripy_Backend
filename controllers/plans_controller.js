@@ -22,12 +22,7 @@ const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
 const addPlan = async (req, res) => {
   try {
-    // console.log('Request to add plan received');
-    // if (!req.body.uid) {
-    //     res.status(400).send('uid is required');
-    //     return;
-    // }
-    console.log("user in plans:", req.body.user);
+    console.log("user in plans:", req.body.uid);
 
     const uid = req.body.user.uid; // Unique identifier for the user
     console.log("uid in plans:", uid);
@@ -35,6 +30,7 @@ const addPlan = async (req, res) => {
     const arrivalDate = req.body.arrivalDate; // Arrival date from request body
     const departureDate = req.body.departureDate; // Departure date from request body
     const social = req.body.social; // Social from request body
+    const loadLevel = req.body.loadLevel; // Load level from request body
 
     // Check if user exists in 'users' collection
     const userQuerySnapshot = await getDocs(
@@ -85,6 +81,7 @@ const addPlan = async (req, res) => {
       arrivalDate: arrivalDate,
       departureDate: departureDate,
       social: social,
+      loadLevel: loadLevel,
     });
 
     if (Object.keys(planContent).length === 0) {
@@ -109,32 +106,60 @@ const generatePlan = async ({
   arrivalDate,
   departureDate,
   social,
+  loadLevel,
 }) => {
   const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-  const prompt = `I am ${gender} aged ${age}, I really like ${preferences.preferences}. // Ensure preferences are correctly accessed
-  I am planning a vacation in ${destination} ${social}. I will be at the destination on ${arrivalDate} - ${departureDate}. 
+
+  console.log("loadLevel in generatePlan:", loadLevel, "Type:", typeof loadLevel);
+  
+  let numberOfActivities;
+  switch (loadLevel) {
+    case '2':
+      numberOfActivities = 2;
+      break;
+    case '3':
+      numberOfActivities = 3;
+      break;
+    case '4':
+      numberOfActivities = 4;
+      break;
+    default:
+      numberOfActivities = 3; // Default to 3 activities if loadLevel is not between 2 and 4
+  }
+
+  console.log("Number of activities:", numberOfActivities);
+
+  const prompt = `I am ${gender} aged ${age}, I really like ${preferences.preferences}.
+  I am planning a vacation in ${destination} ${social}. I will be at the destination on ${arrivalDate} - ${departureDate}.
   Create a travel plan for me for each day separately based on the ratings of the places on google maps 
-  especially from users with the same age range and consider the seasons. 
-      Please do not recommend me what to do and give me only place names for each day. 
-      Make sure the names of the places are clear so that I can later find the places on Google Maps Places API. 
-      Please do it in JSON format and send the JSON only!!! 
-      Your response should follow the following template: 
+  especially from users with the same age range and consider the seasons.
+  Please do not recommend me what to do and give me only place names for each day.
+  Make sure the names of the places are clear so that I can later find the places on Google Maps Places API.
+  Generate ${numberOfActivities} activities per day.
+  Please do it in JSON format and send the JSON only!!!
+  Your response should follow the following template:
+  {
+    "travelPlan": [
       {
-        "travelPlan": [
-          {
-            "day": "dd/mm/yy",
-            "activities": [
-              "PLACE NAME",
-              "…",
-              "…"
-      `;
+        "day": "dd/mm/yy",
+        "activities": [
+          "PLACE NAME",
+          "PLACE NAME",
+          ...
+        ]
+      },
+      ...
+    ]
+  }`;
+  
+
   const result = await model.generateContent(prompt);
   const response = await result.response;
   const text = await response.text();
-  console.log(text);
-  const fetchOrganizedData = await organizeData(text, destination); // Now correctly waits for place IDs
-  return fetchOrganizedData; // Make sure this returns the correct structure for Firestore
+  const fetchOrganizedData = await organizeData(text, destination);
+  return fetchOrganizedData;
 };
+
 
 // This function now becomes async to handle fetching place IDs
 async function organizeData(response, destination) {

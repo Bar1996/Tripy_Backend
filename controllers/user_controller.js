@@ -40,7 +40,7 @@ const transporter = nodemailer.createTransport({
     tokens[randomNumber] = { email, expires: Date.now() + 3600000 };
   
     const mailOptions = {
-      from: 'Your App Tripy@tech-center.com',
+      from: 'Tripy support',
       to: email,
       subject: 'Verify Your Email',
       html: `<p>Please verify your email by entering the following code:</p>
