@@ -223,3 +223,27 @@ Content-Type: application/json
   "restaurantName": "La Pepica",
   "placeId": "ChIJPzfTZOXnYQ0RJR4ZLpGGvIo"
 }
+
+
+### deleteUserData
+
+POST http://localhost:3000/deleteUserData
+Content-Type: application/json
+
+ {
+    "email": "bar1677@walla.com",
+    "uid": "Ni7tZYDFCob30bDFJSGTNcfdiA53",
+    "verifynumber": "46008"
+  }
+
+
+### send mail
+
+POST http://localhost:3000/SendMail
+Content-Type: application/json
+
+ {
+    
+    "email": "barc6@walla.com",
+    "uid": "rTqEjx22SeW2TIDTU6fYC9vYyeK2"
+  }

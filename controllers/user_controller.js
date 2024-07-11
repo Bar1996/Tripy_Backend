@@ -1,8 +1,73 @@
-const { getAuth, createUserWithEmailAndPassword, sendEmailVerification } = require('firebase/auth');
-const {collection, addDoc, updateDoc, getDocs, doc, query, where, getDoc} = require('firebase/firestore');
+const { getAuth, signInWithEmailAndPassword, deleteUser } = require('firebase/auth');
+const { collection, addDoc, updateDoc, getDocs, doc, query, where, getDoc, deleteDoc } = require('firebase/firestore');
 const admin = require('firebase-admin');
 const { db } = require('../firebaseConfig.js');
 const jwt = require("jsonwebtoken");
+const express = require('express');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+
+// Middleware
+const app = express();
+app.use(express.json());
+
+const tokens = {}; // In-memory storage for tokens (for simplicity, use a database in production)
+
+// Nodemailer transporter configuration
+const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // use SSL
+    auth: {
+      user: 'tripy.help@gmail.com',
+      pass: 'meox rrfg jfdm shmr', // The 16-character app password
+    },
+  });
+
+
+  const SendMail = async (req, res) => {
+    // Endpoint to send verification email
+    console.log('req.body:', req.body);
+    const uid = req.body.user.uid; // Unique identifier for the user
+    const email = req.body.email;
+   
+
+  
+    // Generate a random 5-digit number
+    const randomNumber = Math.floor(10000 + Math.random() * 90000);
+  
+    // Store the number with an expiration time (e.g., 1 hour)
+    tokens[randomNumber] = { email, expires: Date.now() + 3600000 };
+  
+    const mailOptions = {
+      from: 'Your App Tripy@tech-center.com',
+      to: email,
+      subject: 'Verify Your Email',
+      html: `<p>Please verify your email by entering the following code:</p>
+             <h3>${randomNumber}</h3>`,
+    };
+
+    const userQuerySnapshot = await getDocs(query(collection(db, 'users'), where('uid', '==', uid)));
+    if (userQuerySnapshot.empty) {
+        res.status(404).send('User not found');
+        return;
+    }
+
+    const userDoc = userQuerySnapshot.docs[0].ref;
+
+
+    await updateDoc(userDoc, {
+        verifynumber: randomNumber,
+    });
+  
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+        return res.status(500).send('Error sending verification email');
+      }
+      res.send('Verification email sent');
+    });
+  };
 
 
 
@@ -214,6 +279,57 @@ const logout = async (req, res) => {
   };
 
 
+  const deleteUserData = async (req, res) => {
+    try {
+        const uid = req.body.user.uid; // Unique identifier for the user
+        const verifynumber = req.body.verifynumber; // Verification number
+
+        // Check if user exists in 'users' collection
+        const userQuerySnapshot = await getDocs(query(collection(db, 'users'), where('uid', '==', uid)));
+        if (userQuerySnapshot.empty) {
+            res.status(404).send('User not found');
+            return;
+        }
+
+        // Assuming there's only one user with the given uid, get its reference
+        const userDoc = userQuerySnapshot.docs[0].ref;
+        const userData = userQuerySnapshot.docs[0].data();
+
+        console.log('userData:', userData.verifynumber);
+
+        const verifyDelete = userData.verifynumber;
+        
+        // Number inserted by user is not equal to the number in the database
+        if (verifynumber != verifyDelete) {
+            res.status(403).send('Unauthorized');
+            return;
+        } else if (verifynumber == verifyDelete) {
+            await deleteDoc(userDoc);
+
+            // Delete the user's plans
+            const plansQuerySnapshot = await getDocs(query(collection(db, 'plans'), where('uid', '==', uid)));
+            const deletePlanPromises = plansQuerySnapshot.docs.map(planDoc => deleteDoc(planDoc.ref));
+            await Promise.all(deletePlanPromises);
+    
+            // Delete the user's preferences
+            if (userData.preferences_uid) {
+                const preferencesDocRef = doc(db, 'preferences', userData.preferences_uid);
+                await deleteDoc(preferencesDocRef);
+            }
+    
+            // Finally, delete the user from Firebase Authentication
+            await admin.auth().deleteUser(uid);
+    
+            res.status(200).send('User data, plans, preferences, and authentication deleted successfully');
+        }
+    } catch (error) {
+        console.error('Error deleting user data:', error);
+        res.status(500).send('Error deleting user data');
+    }
+};
 
 
-module.exports = {addDetails, addPreferences, getDetails, getPreferences, CheckAuth, logout};
+
+
+
+module.exports = {addDetails, addPreferences, getDetails, getPreferences, CheckAuth, logout, deleteUserData, SendMail};
