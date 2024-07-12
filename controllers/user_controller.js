@@ -19,8 +19,8 @@ const transporter = nodemailer.createTransport({
     port: 465,
     secure: true, // use SSL
     auth: {
-      user: 'tripy.help@gmail.com',
-      pass: 'meox rrfg jfdm shmr', // The 16-character app password
+      user: process.env.EMAIL_ADDRESS,
+      pass: process.env.EMAIL_PASSWORD, // The 16-character app password
     },
   });
 

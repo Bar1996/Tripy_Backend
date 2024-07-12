@@ -11,19 +11,26 @@ let pass = null;
 let auth2 = getAuth();
 
 const SignUpWithEmailAndPassword = async (req, res) => {
-    const { email, password } = req.body;   
-    const haveDetails = '0';
+    const { email, password } = req.body;
+
     const havePreferences = '0';
+    const name = req.body.name;
+    const gender = req.body.gender;
+    const dateString = req.body.birthday;
+    const userType = 'local';
+
+    console.log('email, password:', email, password);
+    console.log('name:', name);
+    console.log("gender: ", gender) 
+    console.log('dateString:', dateString);
     auth2 = getAuth();
+   
     if (passwordValid && emailValid ) {
         const user = {
             email: email,
             password: password,
         };
 
-        const adduser = {
-            email: email,
-        };
         try {
             const docRef = await createUserWithEmailAndPassword(auth2, user.email, user.password);
             const userObj = docRef.user;
@@ -40,12 +47,24 @@ const SignUpWithEmailAndPassword = async (req, res) => {
             res.send({ success: true, userId: userObj.uid });
             try {
                 console.log('checkpoint email: ', email, 'uid:', userObj.uid );
+                const birthDate = new Date(dateString);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                console.log('age:', age);
                 // Save the post data to Firestore
                 await addDoc(collection(db, "users"), {
                     email: email,
                     uid: userObj.uid,
-                    haveDetails: haveDetails,
-                    havePreferences: havePreferences
+                    havePreferences: havePreferences,
+                    name: name,
+                    gender: gender,
+                    dateOfBirth: dateString,
+                    age: age,
+                    userType: userType,
                 });
 
                 console.log('Post data saved:');

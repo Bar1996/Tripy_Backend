@@ -3,9 +3,13 @@ POST  http://localhost:3000/signup
 Content-Type: application/json
 
 {
-  "email": "test123@gmail.com",
-  "password": "test123"
+  "email": "bc9545677@gmail.com",
+  "password": "test123",
+  "name": "Bar Cohen",
+  "gender": "Male",
+  "birthday": "1996-11-09"
 }
+
 
 #### POST /post_email - Post Email
 POST http://localhost:3000/post_email
@@ -245,6 +249,6 @@ Content-Type: application/json
 
  {
     
-    "email": "barc6@walla.com",
-    "uid": "rTqEjx22SeW2TIDTU6fYC9vYyeK2"
+    "email": "bar3668@gmail.com",
+    "uid": "FjinfbrdI7hANro7MC740lBNjll1"
   }
