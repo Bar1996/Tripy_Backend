@@ -12,5 +12,6 @@ router.get("/check",auth, user_controller.CheckAuth);
 router.get("/logout", user_controller.logout);
 router.post("/deleteUserData",auth, user_controller.deleteUserData);
 router.post("/SendMail",auth, user_controller.SendMail);
+router.post("/changePassword",auth, user_controller.changePassword);
 
 module.exports = router;

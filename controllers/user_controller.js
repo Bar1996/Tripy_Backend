@@ -1,4 +1,4 @@
-const { getAuth, signInWithEmailAndPassword, deleteUser } = require('firebase/auth');
+const { getAuth, signInWithEmailAndPassword, deleteUser, updatePassword  } = require('firebase/auth');
 const { collection, addDoc, updateDoc, getDocs, doc, query, where, getDoc, deleteDoc } = require('firebase/firestore');
 const admin = require('firebase-admin');
 const { db } = require('../firebaseConfig.js');
@@ -328,8 +328,52 @@ const logout = async (req, res) => {
     }
 };
 
+//function get currnet password to check if it is correct and new password to update it
+const changePassword = async (req, res) => {
+    try {
+        const uid = req.body.user.uid; // Unique identifier for the user
+        const { currentPassword, newPassword } = req.body; // Destructure req.body
+
+        // Fetch user document from Firestore
+        const userQuerySnapshot = await getDocs(query(collection(db, 'users'), where('uid', '==', uid)));
+        if (userQuerySnapshot.empty) {
+            return res.status(404).send('User not found');
+        }
+
+        const userDoc = userQuerySnapshot.docs[0];
+        const userData = userDoc.data();
+        const email = userData.email;
+
+        // Authenticate user with current password
+        const auth = getAuth();
+        const userCredential = await signInWithEmailAndPassword(auth, email, currentPassword);
+        const user = userCredential.user;
+
+        // Update password
+        await updatePassword(user, newPassword);
+
+        return res.status(200).send('Password updated successfully');
+    } catch (error) {
+        console.error('Error changing password:', error);
+
+        // Handle specific errors
+        if (error.code === 'auth/invalid-credential') {
+            return res.status(400).send('Current password is incorrect');
+        } else if (error.code === 'auth/weak-password') {
+            return res.status(400).send('New password is too weak');
+        } else if (error.code === 'auth/user-not-found') {
+            return res.status(404).send('User not found');
+        }
+
+        return res.status(500).send('Error changing password');
+    }
+};
+
+    
+    
 
 
 
 
-module.exports = {addDetails, addPreferences, getDetails, getPreferences, CheckAuth, logout, deleteUserData, SendMail};
+
+module.exports = {addDetails, addPreferences, getDetails, getPreferences, CheckAuth, logout, deleteUserData, SendMail,changePassword};

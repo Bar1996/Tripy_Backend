@@ -34,8 +34,8 @@ POST  http://localhost:3000/login
 Content-Type: application/json
 
 {
-  "email": "bar31616@gmail.com",
-  "password": "Bar1234567"
+  "email": "bc9545677@gmail.com",
+  "password": "091196"
 }
 
 
@@ -251,4 +251,16 @@ Content-Type: application/json
     
     "email": "bar3668@gmail.com",
     "uid": "FjinfbrdI7hANro7MC740lBNjll1"
+  }
+
+
+### change password
+
+POST http://localhost:3000/changePassword
+Content-Type: application/json
+
+ {
+    "newPassword": "091196",
+    "uid": "Djb2XCSQaVSLZG4MKlHEkv40HTk1",
+    "currentPassword": "Bar1234567"
   }
