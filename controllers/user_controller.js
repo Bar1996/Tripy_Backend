@@ -332,12 +332,12 @@ const logout = async (req, res) => {
 const changePassword = async (req, res) => {
     try {
         const uid = req.body.user.uid; // Unique identifier for the user
-        const { currentPassword, newPassword } = req.body; // Destructure req.body
+        const { currentPassword, newPassword } = req.body;
 
         // Fetch user document from Firestore
         const userQuerySnapshot = await getDocs(query(collection(db, 'users'), where('uid', '==', uid)));
         if (userQuerySnapshot.empty) {
-            return res.status(404).send('User not found');
+            return res.status(404).json({ success: false, message: 'User not found' });
         }
 
         const userDoc = userQuerySnapshot.docs[0];
@@ -352,22 +352,26 @@ const changePassword = async (req, res) => {
         // Update password
         await updatePassword(user, newPassword);
 
-        return res.status(200).send('Password updated successfully');
+        return res.status(200).json({ success: true, message: 'Password updated successfully' });
     } catch (error) {
         console.error('Error changing password:', error);
 
-        // Handle specific errors
+        // Handle specific errors with structured JSON responses
         if (error.code === 'auth/invalid-credential') {
-            return res.status(400).send('Current password is incorrect');
+            return res.status(400).json({ success: false, message: 'Current password is incorrect' });
         } else if (error.code === 'auth/weak-password') {
-            return res.status(400).send('New password is too weak');
+            return res.status(400).json({ success: false, message: 'New password is too weak' });
         } else if (error.code === 'auth/user-not-found') {
-            return res.status(404).send('User not found');
+            return res.status(404).json({ success: false, message: 'User not found' });
+        } else if (error.code === 'auth/too-many-requests') {
+            return res.status(429).json({ success: false, message: 'Too many requests, please try again later' });
         }
 
-        return res.status(500).send('Error changing password');
+        // Generic error response
+        return res.status(500).json({ success: false, message: 'Error changing password' });
     }
 };
+
 
     
     
