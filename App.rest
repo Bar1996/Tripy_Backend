@@ -98,7 +98,7 @@ POST http://localhost:3000/addPlan
 Content-Type: application/json
 
 {
-  "uid": "L5atNw823IaCWsyMICCLRlhleUM2",
+  "uid": "Djb2XCSQaVSLZG4MKlHEkv40HTk1",
   "destination": "Tel Aviv",
   "arrivalDate": "2024-08-04",
   "departureDate": "2024-08-06",

@@ -91,7 +91,7 @@ const addPlan = async (req, res) => {
 
     await updateDoc(doc(db, "plans", planUid), planContent);
 
-    res.status(200).send("Plan added and generated successfully");
+    res.status(200).json({ planId: planUid, message: "Plan added and generated successfully" });
   } catch (error) {
     console.error("Error adding plan:", error);
     res.status(500).send("Error adding plan");
