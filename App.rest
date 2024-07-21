@@ -197,8 +197,8 @@ POST http://localhost:3000/deleteActivity
 Content-Type: application/json
 
 {
-  "planId": "x01DwKOZzrALYvOEK5pe",
-  "dayIndex": "0",
+  "planId": "sqMz6Cr7PNW9ICTEJt97",
+  "dayIndex": "3",
   "activityIndex": "0"
 }
 

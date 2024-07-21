@@ -620,11 +620,11 @@ const deleteActivity = async (req, res) => {
       console.log('departureDate in if:', departureDate.getTime(), 'dayDate in if:', dayDate.getTime());
       if (dayDate.getTime() === departureDate.getTime()) {
         planData.departureDate = travelPlan.length > 0
-          ? travelPlan[travelPlan.length - 1]?.day
-            ? parseDate(travelPlan[travelPlan.length - 1].day).toISOString().split("T")[0]
+          ? travelPlan[travelPlan.length - 2]?.day
+            ? parseDate(travelPlan[travelPlan.length - 2].day).toISOString().split("T")[0]
             : null
           : null;
-        console.log('departureDate in if222222:', planData.departureDate);
+        console.log('departureDate in if222222 enter here should do this here:', planData.departureDate);
       }
       travelPlan.splice(dayIndex, 1);
     }
