@@ -132,8 +132,7 @@ const generatePlan = async ({
 
   const prompt = `I am ${gender} aged ${age}, I really like ${preferences.preferences}.
   I am planning a vacation in ${destination} ${social}. I will be at the destination on ${arrivalDate} - ${departureDate} (please 
-  do this from the arrival Date to the departure Date without missing dates! The first day of the plan is ${arrivalDate}
-   and the last day of the plan is ${departureDate}, Dont miss the departure date!! ).
+  do this from the arrival Date to the departure Date without missing dates! ).
   Create a travel plan for me for each day separately based on the ratings of the places on google maps 
   especially from users with the same age range and consider the seasons.
   Please do not recommend me what to do and give me only place names for each day.
