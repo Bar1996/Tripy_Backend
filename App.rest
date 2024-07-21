@@ -99,10 +99,10 @@ Content-Type: application/json
 
 {
   "uid": "Djb2XCSQaVSLZG4MKlHEkv40HTk1",
-  "destination": "Tel Aviv",
-  "arrivalDate": "2024-08-04",
-  "departureDate": "2024-08-06",
-  "social": "Friends",
+  "destination": "Paris",
+  "arrivalDate": "2024-07-28",
+  "departureDate": "2024-07-31",
+  "social": "Solo",
   "loadLevel": 2
 }
 
@@ -193,11 +193,11 @@ Content-Type: application/json
 
 ### editActivity
 
-POST http://localhost:3000/delete
+POST http://localhost:3000/deleteActivity
 Content-Type: application/json
 
 {
-  "planId": "mM27GpY50jzDQuvVaXkw",
+  "planId": "x01DwKOZzrALYvOEK5pe",
   "dayIndex": "0",
   "activityIndex": "0"
 }

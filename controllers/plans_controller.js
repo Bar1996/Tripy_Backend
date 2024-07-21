@@ -22,7 +22,7 @@ const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
 const addPlan = async (req, res) => {
   try {
-    console.log("user in plans:", req.body.uid);
+  
 
     const uid = req.body.user.uid; // Unique identifier for the user
     console.log("uid in plans:", uid);
@@ -88,6 +88,7 @@ const addPlan = async (req, res) => {
       console.error("Plan content generation failed or returned empty.");
       return res.status(500).send("Error generating plan content.");
     }
+    
 
     await updateDoc(doc(db, "plans", planUid), planContent);
 
@@ -130,7 +131,9 @@ const generatePlan = async ({
   console.log("Number of activities:", numberOfActivities);
 
   const prompt = `I am ${gender} aged ${age}, I really like ${preferences.preferences}.
-  I am planning a vacation in ${destination} ${social}. I will be at the destination on ${arrivalDate} - ${departureDate}.
+  I am planning a vacation in ${destination} ${social}. I will be at the destination on ${arrivalDate} - ${departureDate} (please 
+  do this from the arrival Date to the departure Date without missing dates! The first day of the plan is ${arrivalDate}
+   and the last day of the plan is ${departureDate}, Dont miss the departure date!! ).
   Create a travel plan for me for each day separately based on the ratings of the places on google maps 
   especially from users with the same age range and consider the seasons.
   Please do not recommend me what to do and give me only place names for each day.
@@ -573,8 +576,6 @@ const deleteActivity = async (req, res) => {
     }
 
     const planData = planDoc.data();
-    console.log("planData: ", planData);
-
     const travelPlan = planData.travelPlan;
     if (!travelPlan[dayIndex]) {
       return res.status(404).send("Day not found in travel plan");
@@ -588,12 +589,53 @@ const deleteActivity = async (req, res) => {
     }
 
     // Delete the activity from the travel plan
-    console.log("Before: ", travelPlan[dayIndex].activities);
     travelPlan[dayIndex].activities.splice(activityIndex, 1);
-    console.log("After: ", travelPlan);
+
+    // Function to convert date strings to Date objects for comparison
+    const parseDate = (dateStr) => {
+      if (dateStr.includes("/")) {
+        // For "29/07/24" format
+        const [day, month, year] = dateStr.split("/");
+        return new Date(`20${year}-${month}-${day}`);
+      } else {
+        // For "2024-07-28" format
+        return new Date(dateStr);
+      }
+    };
+
+    const dayDate = parseDate(travelPlan[dayIndex].day);
+    const arrivalDate = parseDate(planData.arrivalDate);
+    const departureDate = parseDate(planData.departureDate);
+    console.log('dayDate:', dayDate, 'arrivalDate: ', arrivalDate, 'departureDate: ', departureDate);
+
+    // Check if the day has no activities left, and if so, delete the day
+    if (travelPlan[dayIndex].activities.length === 0) {
+      console.log('arrivalDate in if:', arrivalDate.getTime(), 'dayDate in if:', dayDate.getTime());
+      if (dayDate.getTime() === arrivalDate.getTime()) {
+        planData.arrivalDate = travelPlan.length > 1
+          ? travelPlan[1]?.day
+            ? parseDate(travelPlan[1].day).toISOString().split("T")[0]
+            : null
+          : null;
+      }
+      console.log('departureDate in if:', departureDate.getTime(), 'dayDate in if:', dayDate.getTime());
+      if (dayDate.getTime() === departureDate.getTime()) {
+        planData.departureDate = travelPlan.length > 0
+          ? travelPlan[travelPlan.length - 1]?.day
+            ? parseDate(travelPlan[travelPlan.length - 1].day).toISOString().split("T")[0]
+            : null
+          : null;
+        console.log('departureDate in if222222:', planData.departureDate);
+      }
+      travelPlan.splice(dayIndex, 1);
+    }
 
     // Update the plan in the database
-    await updateDoc(doc(db, "plans", planId), { travelPlan });
+    await updateDoc(doc(db, "plans", planId), {
+      travelPlan,
+      arrivalDate: planData.arrivalDate,
+      departureDate: planData.departureDate,
+    });
 
     res.status(200).send("Activity deleted successfully");
   } catch (error) {
@@ -601,6 +643,10 @@ const deleteActivity = async (req, res) => {
     res.status(500).send("Error deleting activity");
   }
 };
+
+
+
+
 
 const FindRestaurantNearBy = async (req, res) => {
   try {
