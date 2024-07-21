@@ -99,7 +99,7 @@ Content-Type: application/json
 
 {
   "uid": "Djb2XCSQaVSLZG4MKlHEkv40HTk1",
-  "destination": "Paris",
+  "destination": "Madrid",
   "arrivalDate": "2024-07-28",
   "departureDate": "2024-07-31",
   "social": "Solo",

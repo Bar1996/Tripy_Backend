@@ -22,8 +22,6 @@ const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
 const addPlan = async (req, res) => {
   try {
-  
-
     const uid = req.body.user.uid; // Unique identifier for the user
     console.log("uid in plans:", uid);
     const destination = req.body.destination; // Destination from request body
@@ -88,7 +86,6 @@ const addPlan = async (req, res) => {
       console.error("Plan content generation failed or returned empty.");
       return res.status(500).send("Error generating plan content.");
     }
-    
 
     await updateDoc(doc(db, "plans", planUid), planContent);
 
@@ -112,7 +109,7 @@ const generatePlan = async ({
   const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
   console.log("loadLevel in generatePlan:", loadLevel, "Type:", typeof loadLevel);
-  
+
   let numberOfActivities;
   switch (loadLevel) {
     case 2:
@@ -131,15 +128,14 @@ const generatePlan = async ({
   console.log("Number of activities:", numberOfActivities);
 
   const prompt = `I am ${gender} aged ${age}, I really like ${preferences.preferences}.
-  I am planning a vacation in ${destination} ${social}. I will be at the destination on ${arrivalDate} - ${departureDate} (please 
-  do this from the arrival Date to the departure Date without missing dates! ).
-  Create a travel plan for me for each day separately based on the ratings of the places on google maps 
+  I am planning a vacation in ${destination} ${social}. I will be at the destination from ${arrivalDate} to ${departureDate}.
+  Create a travel plan for me for each day separately based on the ratings of the places on Google Maps,
   especially from users with the same age range and consider the seasons.
   Please do not recommend me what to do and give me only place names for each day.
   Make sure the names of the places are clear so that I can later find the places on Google Maps Places API.
   Generate ${numberOfActivities} activities per day.
-  Please do it in JSON format and send the JSON only!!!
-  Your response should follow the following template:
+  Ensure that the plan includes both the day of arrival and the day of departure.
+  Please provide the response in JSON format as follows:
   {
     "travelPlan": [
       {
@@ -153,7 +149,6 @@ const generatePlan = async ({
       ...
     ]
   }`;
-  
 
   const result = await model.generateContent(prompt);
   const response = await result.response;
@@ -162,9 +157,8 @@ const generatePlan = async ({
   return fetchOrganizedData;
 };
 
-
-// This function now becomes async to handle fetching place IDs
-async function organizeData(response, destination) {
+// Assuming organizeData is defined elsewhere in your code
+async function organizeData(response, destination, departureDate) {
   const startIndex = response.indexOf("{");
   const endIndex = response.lastIndexOf("}") + 1;
   if (startIndex === -1 || endIndex === -1) {
@@ -187,12 +181,25 @@ async function organizeData(response, destination) {
       day.activities = activitiesWithPlaceIds.filter((id) => id !== null); // Filter out null IDs
     }
 
+    
+
+    
+
     return data; // Now includes place IDs instead of names
   } catch (error) {
     console.error("Error parsing JSON:", error);
     return {};
   }
 }
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
 
 async function getActivityPlaceId(activity, destination) {
   const query = `${activity} in ${destination}`;
