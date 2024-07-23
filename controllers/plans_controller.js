@@ -538,27 +538,27 @@ const replaceActivity = async (req, res) => {
   }
 };
 
-async function getActivityPlaceId(activityName, destination) {
-  const query = `${activityName} in ${destination}`;
-  const apiUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
-    query
-  )}&key=${apiKey}`;
-  try {
-    const response = await fetch(apiUrl);
-    const data = await response.json();
-    if (data.results && data.results.length > 0) {
-      return data.results[0].place_id;
-    } else {
-      console.error(
-        `No place found for activity: ${activityName} in destination: ${destination}`
-      );
-      return null;
-    }
-  } catch (error) {
-    console.error("Error fetching activity place ID:", error);
-    return null;
-  }
-}
+// async function getActivityPlaceId(activityName, destination) {
+//   const query = `${activityName} in ${destination}`;
+//   const apiUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
+//     query
+//   )}&key=${apiKey}`;
+//   try {
+//     const response = await fetch(apiUrl);
+//     const data = await response.json();
+//     if (data.results && data.results.length > 0) {
+//       return data.results[0].place_id;
+//     } else {
+//       console.error(
+//         `No place found for activity: ${activityName} in destination: ${destination}`
+//       );
+//       return null;
+//     }
+//   } catch (error) {
+//     console.error("Error fetching activity place ID:", error);
+//     return null;
+//   }
+// }
 
 //delete activity
 const deleteActivity = async (req, res) => {

@@ -8,7 +8,6 @@ const { db } = require("./firebaseConfig.js");
 
 const signupRoute = require("./routes/signup_route.js");
 const loginRoute = require("./routes/login_route.js");
-const aiRoute = require("./routes/ai_route.js");
 const plansRoute = require("./routes/plans_route.js");
 const userRoute = require("./routes/user_route.js");
 
@@ -18,7 +17,6 @@ const initApp = () => {
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use("/", signupRoute);
     app.use("/", loginRoute);
-    app.use("/", aiRoute);
     app.use("/", plansRoute);
     app.use("/", userRoute);
     resolve(app);
