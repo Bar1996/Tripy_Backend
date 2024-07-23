@@ -122,34 +122,7 @@ const generateTokens = (userId) => {
   };
 };
 
-// const signInGoogle = async (req, res) => {
-//   try {
-//     const { user } = req.body;
-//     const userUid = user.uid;
-//     const email = user.email;
 
-//     // Check if the user already exists in the database
-//     const usersCollection = collection(db, "users");
-//     const userQuery = query(usersCollection, where("uid", "==", userUid));
-//     const userQuerySnapshot = await getDocs(userQuery);
-
-//     if (userQuerySnapshot.empty) {
-//       // User does not exist, add them to the database
-//       await addDoc(usersCollection, {
-//         email: email,
-//         uid: userUid,
-//       });
-
-//       res.status(200).json({ success: true });
-//     } else {
-//       // User already exists, handle it accordingly
-//       res.status(200).json({ success: false, message: "User already exists" });
-//     }
-//   } catch (error) {
-//     console.error("Error signing in with Google", error);
-//     res.status(500).json({ error: "Internal Server Error" });
-//   }
-// };
 
 const googleSignIn = async (req, res) => {
   try {
@@ -374,60 +347,7 @@ const refresh = async (req, res) => {
   );
 };
 
-//TODO: Add the Maps function
-const Maps = async (req, res) => {
-  const { place_id } = req.params;
-  try {
-    const response = await axios.get(
-      `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place_id}&key=${process.env.GOOGLE_MAPS_API_KEY}`
-    );
-    const data = response.data;
-    res.json(data);
-  } catch (error) {
-    console.error("Error fetching place details:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
 
-// const CheckDetails = async (req, res) => {
-//   try {
-//     // Ensure user is authenticated
-//     const auth2 = getAuth();
-
-//     // Get the UID of the authenticated user
-//     const uid = auth2.currentUser.uid;
-
-//     // Assuming 'users' is the collection name where your user data resides
-//     const usersCollection = collection(db, "users");
-
-//     // Query the user document by uid
-//     const q = query(usersCollection, where("uid", "==", uid));
-
-//     // Get documents that match the query
-//     const querySnapshot = await getDocs(q);
-
-//     // If no documents match the query
-//     if (querySnapshot.empty) {
-//       return { message: "No user found with the provided UID" };
-//     }
-
-//     // Assuming there's only one document for each user
-//     const userData = querySnapshot.docs[0].data();
-//     const haveDetails = userData.haveDetails;
-
-//     if (haveDetails === "1" || haveDetails === "0") {
-//       // 'haveDetails' field is either '1' or '0'
-//       return haveDetails;
-//     } else {
-//       // 'haveDetails' field is neither '1' nor '0'
-//       return { message: "Invalid value for 'haveDetails' field" };
-//     }
-//   } catch (error) {
-//     // Handle errors
-//     console.error("Error checking details:", error);
-//     res.status(500).json({ success: false, message: "Internal server error" });
-//   }
-// };
 
 const CheckPreferences = async (uid) => {
   try {
@@ -456,7 +376,6 @@ const CheckPreferences = async (uid) => {
 module.exports = {
   LoginWithEmailAndPassword,
   resetPassword,
-  Maps,
   refresh,
   googleSignIn,
 };

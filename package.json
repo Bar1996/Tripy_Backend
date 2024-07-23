@@ -7,6 +7,7 @@
     "start": "node Server.js",
     "dev": "nodemon Server.js",
     "test": "jest --detectOpenHandles --forceExit",
+    "testplans": "jest --detectOpenHandles --forceExit ./tests/plans.test.js",
     "lint": "eslint src/* --color --fix"
   },
   "keywords": [],
