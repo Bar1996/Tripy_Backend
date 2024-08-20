@@ -7,36 +7,27 @@ const express = require('express');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 
-// Middleware
 const app = express();
 app.use(express.json());
 
-const tokens = {}; // In-memory storage for tokens (for simplicity, use a database in production)
+const tokens = {}; 
 
-// Nodemailer transporter configuration
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 465,
-    secure: true, // use SSL
+    secure: true,
     auth: {
       user: process.env.EMAIL_ADDRESS,
-      pass: process.env.EMAIL_PASSWORD, // The 16-character app password
+      pass: process.env.EMAIL_PASSWORD, 
     },
   });
 
 
   const SendMail = async (req, res) => {
-    // Endpoint to send verification email
-    console.log('req.body:', req.body);
-    const uid = req.body.user.uid; // Unique identifier for the user
+    const uid = req.body.user.uid; 
     const email = req.body.email;
-   
-
-  
-    // Generate a random 5-digit number
     const randomNumber = Math.floor(10000 + Math.random() * 90000);
   
-    // Store the number with an expiration time (e.g., 1 hour)
     tokens[randomNumber] = { email, expires: Date.now() + 3600000 };
   
     const mailOptions = {
@@ -75,17 +66,13 @@ const addDetails = async (req, res) => {
     try {
   
 
-        console.log('user in add deatails:', req.body.user.uid);
         const uid = req.body.user.uid; // Unique identifier for the user
         const name = req.body.name;
         const gender = req.body.gender;
         const dateString = req.body.birthday;
         const haveDetails = '1';
         
-        console.log('uid:', uid);
-        console.log('name:', name);
-        console.log('gender:', gender);
-        console.log('dateOfBirth:', dateString);
+      
 
         const birthDate = new Date(dateString);
         const today = new Date();
@@ -94,7 +81,6 @@ const addDetails = async (req, res) => {
         if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
             age--;
         }
-        console.log('age:', age);
         // Fetch the user document from Firestore by uid
         const q = query(collection(db, 'users'), where('uid', '==', uid));
         const querySnapshot = await getDocs(q);
@@ -104,14 +90,13 @@ const addDetails = async (req, res) => {
             return;
         }
 
-        // Assuming there's only one user with the given uid, get its reference
         const userDoc = querySnapshot.docs[0].ref;
 
         // Update the user document with the new information
         await updateDoc(userDoc, {
             name: name,
             gender: gender,
-            dateOfBirth: dateString, // Assuming dateOfBirth field exists in your Firestore schema
+            dateOfBirth: dateString, 
             haveDetails: haveDetails,
             age: age
         });
@@ -127,13 +112,12 @@ const addPreferences = async (req, res) => {
     try {
   
 
-        console.log('user in add preferences:', req.body.user.uid);
 
-        const uid = req.body.user.uid; // Unique identifier for the user
-        const preferences = req.body.preferences; // Get preferences from request body
+        const uid = req.body.user.uid; 
+        const preferences = req.body.preferences; 
         const havePreferences = '1';
 
-        // Check if user exists in 'users' collection
+        
         const userQuerySnapshot = await getDocs(query(collection(db, 'users'), where('uid', '==', uid)));
         if (userQuerySnapshot.empty) {
             res.status(404).send('User not found');
@@ -143,7 +127,6 @@ const addPreferences = async (req, res) => {
         const userData = userQuerySnapshot.docs[0].data();
         const preferencesUid = userData.preferences_uid;
 
-        // Check if user has preferences_uid
         if (preferencesUid) {
             // Update preferences document in 'preferences' collection
             const preferencesDocRef = doc(db, 'preferences', preferencesUid);
@@ -169,7 +152,7 @@ const getDetails = async (req, res) => {
     try {
       
 
-        const uid = req.body.user.uid; // Unique identifier for the user
+        const uid = req.body.user.uid;
 
         // Check if user exists in 'users' collection
         const userQuerySnapshot = await getDocs(query(collection(db, 'users'), where('uid', '==', uid)));
@@ -199,7 +182,7 @@ const getPreferences = async (req, res) => {
     try {
 
 
-        const uid = req.body.user.uid; // Unique identifier for the user
+        const uid = req.body.user.uid; 
 
         // Check if user exists in 'users' collection and has a preferences_uid
         const userQuerySnapshot = await getDocs(query(collection(db, 'users'), where('uid', '==', uid)));
@@ -236,7 +219,7 @@ const getPreferences = async (req, res) => {
 }
 
 const CheckAuth = async (req, res) => {
-    console.log("Checking token validity"); // Check if this gets printed
+    console.log("Checking token validity"); 
     res.status(200).json({
         message: "Authenticated",
     });
@@ -281,8 +264,8 @@ const logout = async (req, res) => {
 
   const deleteUserData = async (req, res) => {
     try {
-        const uid = req.body.user.uid; // Unique identifier for the user
-        const verifynumber = req.body.verifynumber; // Verification number
+        const uid = req.body.user.uid; 
+        const verifynumber = req.body.verifynumber; 
 
         // Check if user exists in 'users' collection
         const userQuerySnapshot = await getDocs(query(collection(db, 'users'), where('uid', '==', uid)));
@@ -291,11 +274,9 @@ const logout = async (req, res) => {
             return;
         }
 
-        // Assuming there's only one user with the given uid, get its reference
         const userDoc = userQuerySnapshot.docs[0].ref;
         const userData = userQuerySnapshot.docs[0].data();
 
-        console.log('userData:', userData.verifynumber);
 
         const verifyDelete = userData.verifynumber;
         
@@ -328,10 +309,9 @@ const logout = async (req, res) => {
     }
 };
 
-//function get currnet password to check if it is correct and new password to update it
 const changePassword = async (req, res) => {
     try {
-        const uid = req.body.user.uid; // Unique identifier for the user
+        const uid = req.body.user.uid; 
         const { currentPassword, newPassword } = req.body;
 
         // Fetch user document from Firestore
@@ -356,7 +336,6 @@ const changePassword = async (req, res) => {
     } catch (error) {
         console.error('Error changing password:', error);
 
-        // Handle specific errors with structured JSON responses
         if (error.code === 'auth/invalid-credential') {
             return res.status(400).json({ success: false, message: 'Current password is incorrect' });
         } else if (error.code === 'auth/weak-password') {
@@ -367,7 +346,6 @@ const changePassword = async (req, res) => {
             return res.status(429).json({ success: false, message: 'Too many requests, please try again later' });
         }
 
-        // Generic error response
         return res.status(500).json({ success: false, message: 'Error changing password' });
     }
 };

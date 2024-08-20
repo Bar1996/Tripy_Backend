@@ -4,7 +4,6 @@ const { collection, getDocs, query, where, doc, deleteDoc, updateDoc } = require
 const { db } = require('../firebaseConfig');
 const admin = require('firebase-admin');
 
-// Initialize Firebase Admin
 
 
 const testUser = {
@@ -23,7 +22,6 @@ let refreshToken = "";
 
 beforeAll(async () => {
     jest.setTimeout(30000);
-    // Initialize the Express app
     app = await appInit();
     console.log('beforeAll');
     // Clean up any existing test data
@@ -137,7 +135,7 @@ describe('User Controller Tests', () => {
       gender: 'Male',
       dateOfBirth: '1990-01-01',
       email: testUser.email,
-      userType: 'local' // Adjust according to your schema
+      userType: 'local' 
     });
   });
 
@@ -178,7 +176,7 @@ describe('User Controller Tests', () => {
       .send();
     expect(res.statusCode).toBe(200);
     expect(res.text).toBe('logout successful');
-    //login again after logout and apdate the tokens for the next tests
+    //login again after logout and update the tokens for the next tests
     const loginRes = await request(app).post('/login').send({
       email: testUser.email,
       password: 'new-password'

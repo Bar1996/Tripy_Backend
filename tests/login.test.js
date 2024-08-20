@@ -19,8 +19,7 @@ let accessToken = "";
 let refreshToken = "";
 
 beforeAll(async () => {
-  jest.setTimeout(30000); // Set timeout to 30 seconds
-  // Initialize the Express app
+  jest.setTimeout(30000); 
   app = await appInit();
   console.log('beforeAll');
   // Clean up any existing test data
@@ -80,17 +79,15 @@ beforeAll(async () => {
   expect(loginRes.body.refreshToken).toBeDefined();
   accessToken = loginRes.body.accessToken;
   refreshToken = loginRes.body.refreshToken;
-}, 30000); // Set timeout to 30 seconds
+}, 30000); 
 
 afterAll(async () => {
   console.log('afterAll');
-  // Clean up any test data
   const userQuerySnapshot = await getDocs(query(collection(db, 'users'), where('email', '==', testUser.email)));
   if (!userQuerySnapshot.empty) {
     const userDoc = userQuerySnapshot.docs[0].ref;
     await deleteDoc(userDoc);
   }
-  // Delete the user from Firebase Auth
   console.log('Deleting user:', testUser.uid);
   await admin.auth().deleteUser(testUser.uid);
 });
@@ -103,7 +100,7 @@ describe('Auth Controller Tests', () => {
     expect(res.statusCode).toBe(200);
     expect(res.body.accessToken).toBeDefined();
     expect(res.body.refreshToken).toBeDefined();
-  }, 30000); // Set timeout to 30 seconds
+  }, 30000); 
 
   test('POST /resetPass', async () => {
     const res = await request(app)
@@ -111,7 +108,7 @@ describe('Auth Controller Tests', () => {
       .send({ email: testUser.email });
     expect(res.statusCode).toBe(200);
     expect(res.text).toBe('If the email address exists in our system, a password reset email will be sent');
-  }, 30000); // Set timeout to 30 seconds
+  }, 30000); 
 
   test('GET /refresh', async () => {
     const res = await request(app)
@@ -121,5 +118,5 @@ describe('Auth Controller Tests', () => {
     expect(res.statusCode).toBe(200);
     expect(res.body.accessToken).toBeDefined();
     expect(res.body.refreshToken).toBeDefined();
-  }, 30000); // Set timeout to 30 seconds
+  }, 30000); 
 });

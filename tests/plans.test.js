@@ -30,8 +30,7 @@ let accessToken = "";
 let planId = "";
 
 beforeAll(async () => {
-  jest.setTimeout(30000); // Set timeout to 30 seconds
-  // Initialize the Express app
+  jest.setTimeout(30000); 
   app = await appInit();
   console.log('beforeAll');
   // Clean up any existing test data
@@ -101,7 +100,7 @@ beforeAll(async () => {
     });
   expect(addPreferencesRes.statusCode).toBe(200);
   expect(addPreferencesRes.text).toBe('Preferences added successfully');
-}, 30000); // Set timeout to 30 seconds
+}, 30000); 
 
 afterAll(async () => {
   console.log('afterAll');
@@ -136,7 +135,7 @@ describe('Plans Controller Tests', () => {
     expect(res.body.planId).toBeDefined();
     expect(res.body.message).toBe("Plan added and generated successfully");
     planId = res.body.planId;
-  }, 30000); // Set timeout to 30 seconds
+  }, 30000); 
 
   test('GET /getUserPlanIds', async () => {
     const res = await request(app)
@@ -146,7 +145,7 @@ describe('Plans Controller Tests', () => {
     console.log('getUserPlanIds response:', res.body);
     expect(res.statusCode).toBe(200);
     expect(res.body.planIds).toContain(planId);
-  }, 30000); // Set timeout to 30 seconds
+  }, 30000); 
 
   test('POST /getPlanById', async () => {
     const res = await request(app)
@@ -156,7 +155,88 @@ describe('Plans Controller Tests', () => {
     console.log('getPlanById response:', res.body);
     expect(res.statusCode).toBe(200);
     expect(res.body.destination).toBe(testPlan.destination);
-  }, 30000); // Set timeout to 30 seconds
+  }, 30000); 
+
+
+  test('POST /editActivity - valid data', async () => {
+    const editActivityRes = await request(app)
+      .post('/editActivity')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        planId: planId, 
+        day: "0", 
+        activity: "0" 
+      });
+  
+    console.log('editActivity response:', editActivityRes.body);
+  
+    expect(editActivityRes.statusCode).toBe(200);
+    expect(editActivityRes.body.additionalActivities).toBeDefined();
+    expect(Array.isArray(editActivityRes.body.additionalActivities)).toBe(true);
+  }, 30000); 
+  
+
+  
+  test('POST /replaceActivity', async () => {
+    const replaceActivityRes = await request(app)
+      .post('/replaceActivity')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        planId: planId,
+        dayIndex: 0, 
+        activityIndex: 0, 
+        newActivity: "Eiffel Tower Visit"
+      });
+    console.log('replaceActivity response:', replaceActivityRes.body);
+    expect(replaceActivityRes.statusCode).toBe(200);
+  }, 30000);
+
+  // Add test for deleteActivity
+  test('POST /deleteActivity', async () => {
+    const deleteActivityRes = await request(app)
+      .post('/deleteActivity')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        planId: planId,
+        dayIndex: 0, 
+        activityIndex: 0 
+      });
+    console.log('deleteActivity response:', deleteActivityRes.body);
+    expect(deleteActivityRes.statusCode).toBe(200);
+    expect(deleteActivityRes.text).toBe("Activity deleted successfully");
+  }, 30000);
+
+  test('POST /FindRestaurantNearBy', async () => {
+    const findRestaurantRes = await request(app)
+      .post('/FindRestaurantNearBy')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        planId: planId,
+        day: "0", 
+        activity: "0", 
+        mealType: "Lunch"
+      });
+    console.log('FindRestaurantNearBy response:', findRestaurantRes.body);
+    expect(findRestaurantRes.statusCode).toBe(200);
+    expect(Array.isArray(findRestaurantRes.body)).toBe(true);
+    expect(findRestaurantRes.body.length).toBeGreaterThan(0);
+  }, 30000);
+
+  test('POST /addRestaurantToPlan', async () => {
+    const addRestaurantRes = await request(app)
+      .post('/addRestaurantToPlan')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        planId: planId,
+        dayIndex: 0, 
+        activityIndex: 0, 
+        restaurantName: "Le Jules Verne",
+        placeId: "ChIJAQquYc1v5kcRLKslDuENAxg" 
+      });
+    console.log('addRestaurantToPlan response:', addRestaurantRes.body);
+    expect(addRestaurantRes.statusCode).toBe(200);
+    expect(addRestaurantRes.text).toBe("Restaurant added to plan successfully");
+  }, 30000);
 
   test('POST /deletePlan', async () => {
     const res = await request(app)
@@ -166,5 +246,5 @@ describe('Plans Controller Tests', () => {
     console.log('deletePlan response:', res.body);
     expect(res.statusCode).toBe(200);
     expect(res.text).toBe("Plan deleted successfully");
-  }, 30000); // Set timeout to 30 seconds
+  }, 30000); 
 });

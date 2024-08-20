@@ -5,7 +5,6 @@ const { db } = require('../firebaseConfig');
 const admin = require('firebase-admin');
 const { checkEmailInUse } = require('../helpers/checkEmailInUse');
 
-// Initialize Firebase Admin
 
 
 const testUser = {
@@ -21,8 +20,7 @@ let accessToken = "";
 let refreshToken = "";
 
 beforeAll(async () => {
-  jest.setTimeout(30000); // Set timeout to 30 seconds
-  // Initialize the Express app
+  jest.setTimeout(30000); 
   app = await appInit();
   console.log('beforeAll');
   // Clean up any existing test data
@@ -55,7 +53,7 @@ describe('Signup Controller Tests', () => {
     });
     expect(res.statusCode).toBe(200);
     expect(res.text).toBe('Email is available');
-  }, 30000); // Set timeout to 30 seconds
+  }, 30000); 
 
   test('POST /post_password', async () => {
     const res = await request(app).post('/post_password').send({
@@ -63,7 +61,7 @@ describe('Signup Controller Tests', () => {
     });
     expect(res.statusCode).toBe(200);
     expect(res.text).toBe('Password received');
-  }, 30000); // Set timeout to 30 seconds
+  }, 30000); 
 
   test('POST /signup', async () => {
     const res = await request(app).post('/signup').send({
@@ -77,14 +75,13 @@ describe('Signup Controller Tests', () => {
     expect(res.body.success).toBe(true);
     expect(res.body.userId).toBeDefined();
 
-    // Check that the user is in the database
     const newUserQuerySnapshot = await getDocs(query(collection(db, 'users'), where('email', '==', testUser.email)));
     expect(newUserQuerySnapshot.empty).toBe(false);
-  }, 30000); // Set timeout to 30 seconds
+  }, 30000); 
 
   test('GET /wake', async () => {
     const res = await request(app).get('/wake').send();
     expect(res.statusCode).toBe(200);
     expect(res.text).toBe('awake');
-  }, 30000); // Set timeout to 30 seconds
+  }, 30000); 
 });

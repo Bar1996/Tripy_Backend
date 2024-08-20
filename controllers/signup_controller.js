@@ -19,10 +19,7 @@ const SignUpWithEmailAndPassword = async (req, res) => {
     const dateString = req.body.birthday;
     const userType = 'local';
 
-    console.log('email, password:', email, password);
-    console.log('name:', name);
-    console.log("gender: ", gender) 
-    console.log('dateString:', dateString);
+ 
     auth2 = getAuth();
    
     if (passwordValid && emailValid ) {
@@ -35,7 +32,6 @@ const SignUpWithEmailAndPassword = async (req, res) => {
             const docRef = await createUserWithEmailAndPassword(auth2, user.email, user.password);
             const userObj = docRef.user;
             try {
-                console.log('sending mail');
                 await sendEmailVerification(userObj);
                 console.log('Email verification sent');
             } catch (error) {
@@ -46,7 +42,6 @@ const SignUpWithEmailAndPassword = async (req, res) => {
             // Return user ID along with the response
             res.send({ success: true, userId: userObj.uid });
             try {
-                console.log('checkpoint email: ', email, 'uid:', userObj.uid );
                 const birthDate = new Date(dateString);
                 const today = new Date();
                 let age = today.getFullYear() - birthDate.getFullYear();
@@ -55,7 +50,6 @@ const SignUpWithEmailAndPassword = async (req, res) => {
                     age--;
                 }
                 console.log('age:', age);
-                // Save the post data to Firestore
                 await addDoc(collection(db, "users"), {
                     email: email,
                     uid: userObj.uid,
@@ -67,7 +61,7 @@ const SignUpWithEmailAndPassword = async (req, res) => {
                     userType: userType,
                 });
 
-                console.log('Post data saved:');
+                console.log('User saved' );
             } catch (error) {
                 console.error('Error saving user data:', error);
             }
@@ -85,7 +79,6 @@ const SignUpWithEmailAndPassword = async (req, res) => {
 };
 
 const PostEmail = async (req, res) => {
-    console.log("req.body: ", req.body);
     const { email } = req.body;
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -109,7 +102,6 @@ const PostEmail = async (req, res) => {
         }
     }
 
-    console.log(email);
 };
 
 const PostPassword = async (req, res) => {
@@ -124,7 +116,6 @@ const PostPassword = async (req, res) => {
         passwordValid = true;
         res.send('Password received');
     }
-    console.log(password);
 };
 
 const wake = async (req, res) => {

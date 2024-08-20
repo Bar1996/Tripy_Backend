@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node Server.js",
     "dev": "nodemon Server.js",
-    "test": "jest --detectOpenHandles --forceExit",
+    "test": "jest --detectOpenHandles --forceExit --coverage",
     "testplans": "jest --detectOpenHandles --forceExit ./tests/plans.test.js",
     "lint": "eslint src/* --color --fix"
   },

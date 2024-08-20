@@ -29,18 +29,14 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const LoginWithEmailAndPassword = async (req, res) => {
   const { email, password } = req.body;
-  console.log("Email:", email, "password:", password);
   const auth2 = getAuth();
 
   try {
     await setPersistence(auth2, browserLocalPersistence);
     const userRecord = await signInWithEmailAndPassword(auth2, email, password);
-    console.log("userRecord:", userRecord.user.uid);
 
-    // Generate access and refresh tokens
     const { accessToken, refreshToken } = generateTokens(userRecord.user.uid);
 
-    console.log("Access Token:", jwt.decode(accessToken).uid);
 
     const usersQuery = query(
       collection(db, "users"),
@@ -52,20 +48,15 @@ const LoginWithEmailAndPassword = async (req, res) => {
       console.log(
         "User not found in Firestore, considering adding a new document..."
       );
-      // You can choose to create a new user document here if appropriate
-      // const newUserRef = doc(collection(db, 'users'));
-      // await setDoc(newUserRef, { uid: uid, tokens: [refreshToken], ...otherInitialData });
+      
     } else {
-      // Assuming there's only one user with the given uid
       const userDocRef = querySnapshot.docs[0].ref;
 
-      // Update Firestore with the new refresh token
       await updateDoc(userDocRef, {
         tokens: arrayUnion(refreshToken),
       });
     }
 
-    // Check for email verification
     if (!auth2.currentUser.emailVerified) {
       console.log("Need to verify email");
       res.send("You need to verify your email");
@@ -165,13 +156,11 @@ const googleSignIn = async (req, res) => {
           const ageDate = new Date(ageDifMs);
           age = Math.abs(ageDate.getUTCFullYear() - 1970);
         }
-        console.log("Age:", age);
 
         const genderData = peopleApiResponse.data.genders;
         if (genderData && genderData.length > 0) {
           gender = genderData[0].value;
         }
-        console.log("Gender:", gender);
       } catch (apiError) {
         console.error(
           "Error fetching data from People API:",
@@ -202,7 +191,6 @@ const googleSignIn = async (req, res) => {
 
         const userDoc = await addDoc(usersCollection, user);
         user._id = userDoc.id;
-        console.log("New user added to Firestore:", user);
       } else {
         const userDoc = userQuerySnapshot.docs[0];
         user = userDoc.data();
@@ -211,17 +199,14 @@ const googleSignIn = async (req, res) => {
       }
 
       const { accessToken, refreshToken } = generateTokens(firebaseUid);
-      console.log("Tokens generated:", { accessToken, refreshToken });
 
       const userDocRef = doc(db, "users", user._id);
       await updateDoc(userDocRef, {
         tokens: arrayUnion(refreshToken),
       });
 
-      console.log("User tokens updated in Firestore");
 
       const havePreferences = await CheckPreferences(firebaseUid);
-      console.log("Have Preferences:", havePreferences);
 
       if (havePreferences === "1") {
         console.log("Transfer to Home Page");
@@ -252,15 +237,12 @@ const googleSignIn = async (req, res) => {
 const resetPassword = async (req, res) => {
   const { email } = req.body;
   auth2 = getAuth();
-  console.log("Email:", email);
   try {
     const isEmailInUse = await checkEmailInUse(email);
-    console.log("isEmailInUse:", isEmailInUse);
 
     if (isEmailInUse) {
       sendPasswordResetEmail(auth2, email)
         .then(() => {
-          // Password reset email sent successfully
           console.log(
             "If the email address exists in our system, a password reset email will be sent"
           );
@@ -269,7 +251,6 @@ const resetPassword = async (req, res) => {
           );
         })
         .catch((error) => {
-          // An error occurred while sending the password reset email
           console.error(error);
         });
     } else {
@@ -281,11 +262,9 @@ const resetPassword = async (req, res) => {
     console.error("Error checking email:", error);
     res.status(500).send("An error occurred while checking the email");
   }
-  console.log(email);
 };
 
 const refresh = async (req, res) => {
-  // Extract token from HTTP header
   console.log("Refresh token request received");
   const authHeader = req.headers["authorization"];
   const refreshTokenOrig = authHeader && authHeader.split(" ")[1];
@@ -294,7 +273,6 @@ const refresh = async (req, res) => {
     return res.status(401).send("Missing token");
   }
 
-  // Verify token
   jwt.verify(
     refreshTokenOrig,
     process.env.REFRESH_TOKEN_SECRET,
@@ -304,7 +282,6 @@ const refresh = async (req, res) => {
       }
 
       try {
-        // Query Firestore for the user document using the UID
         const usersQuery = query(
           collection(db, "users"),
           where("uid", "==", userInfo.uid)
@@ -315,26 +292,21 @@ const refresh = async (req, res) => {
           return res.status(403).send("User not found");
         }
 
-        // Assuming there's only one user with the given UID
         const userDocRef = querySnapshot.docs[0].ref;
         const userDoc = querySnapshot.docs[0].data();
 
         if (!userDoc.tokens || !userDoc.tokens.includes(refreshTokenOrig)) {
-          // If the specific refresh token isn't in the array, clear all tokens (optional)
           await updateDoc(userDocRef, { tokens: [] });
           return res.status(403).send("Invalid token");
         }
 
-        // Generate new access token and refresh token
         const { accessToken, refreshToken } = generateTokens(userInfo.uid);
 
-        // Update Firestore with the new refresh token, removing the old one
         const newTokens = userDoc.tokens
           .filter((token) => token !== refreshTokenOrig)
           .concat(refreshToken);
         await updateDoc(userDocRef, { tokens: newTokens });
 
-        // Return new access token & refresh token
         return res.status(200).send({
           accessToken: accessToken,
           refreshToken: refreshToken,

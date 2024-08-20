@@ -5,9 +5,8 @@ const { db } = require('../firebaseConfig.js');
 async function checkEmailInUse(email) {
     try {
         const user = await admin.auth().getUserByEmail(email);
-        return user.providerData.length > 0; // Returns true if email is already in use
+        return user.providerData.length > 0; 
     } catch (error) {
-        // If the user is not found, it means the email is not in use
         if (error.code === 'auth/user-not-found') {
             return false;
         }

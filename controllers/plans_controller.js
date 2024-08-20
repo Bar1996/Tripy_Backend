@@ -22,15 +22,13 @@ const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
 const addPlan = async (req, res) => {
   try {
-    const uid = req.body.user.uid; // Unique identifier for the user
-    console.log("uid in plans:", uid);
-    const destination = req.body.destination; // Destination from request body
-    const arrivalDate = req.body.arrivalDate; // Arrival date from request body
-    const departureDate = req.body.departureDate; // Departure date from request body
-    const social = req.body.social; // Social from request body
-    const loadLevel = req.body.loadLevel; // Load level from request body
+    const uid = req.body.user.uid;
+    const destination = req.body.destination; 
+    const arrivalDate = req.body.arrivalDate; 
+    const departureDate = req.body.departureDate; 
+    const social = req.body.social; 
+    const loadLevel = req.body.loadLevel; 
 
-    // Check if user exists in 'users' collection
     const userQuerySnapshot = await getDocs(
       query(collection(db, "users"), where("uid", "==", uid))
     );
@@ -108,7 +106,6 @@ const generatePlan = async ({
 }) => {
   const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-  console.log("loadLevel in generatePlan:", loadLevel, "Type:", typeof loadLevel);
 
   let numberOfActivities;
   switch (loadLevel) {
@@ -122,10 +119,9 @@ const generatePlan = async ({
       numberOfActivities = 4;
       break;
     default:
-      numberOfActivities = 3; // Default to 3 activities if loadLevel is not between 2 and 4
+      numberOfActivities = 3; 
   }
 
-  console.log("Number of activities:", numberOfActivities);
 
   const prompt = `I am ${gender} aged ${age}, I really like ${preferences.preferences}.
   I am planning a vacation in ${destination} ${social}. I will be at the destination from ${arrivalDate} to ${departureDate}.
@@ -157,7 +153,6 @@ const generatePlan = async ({
   return fetchOrganizedData;
 };
 
-// Assuming organizeData is defined elsewhere in your code
 async function organizeData(response, destination, departureDate) {
   const startIndex = response.indexOf("{");
   const endIndex = response.lastIndexOf("}") + 1;
@@ -170,22 +165,20 @@ async function organizeData(response, destination, departureDate) {
 
   try {
     const data = JSON.parse(jsonData);
-    // Assume data.travelPlan is an array of day objects with activities
     for (const day of data.travelPlan) {
-      // Fetch place IDs for each activity asynchronously
       const activitiesWithPlaceIds = await Promise.all(
         day.activities.map(async (activity) => {
           return await getActivityPlaceId(activity, destination);
         })
       );
-      day.activities = activitiesWithPlaceIds.filter((id) => id !== null); // Filter out null IDs
+      day.activities = activitiesWithPlaceIds.filter((id) => id !== null); 
     }
 
     
 
     
 
-    return data; // Now includes place IDs instead of names
+    return data; 
   } catch (error) {
     console.error("Error parsing JSON:", error);
     return {};
@@ -230,16 +223,11 @@ async function getTravelPlanPlaceIds(travelPlan) {
     const placeIds = await Promise.all(activities.map(getActivityPlaceId));
     activitiesWithPlaceIds.push({ date: day.date, activities: placeIds });
   }
-  console.log(activitiesWithPlaceIds);
   return activitiesWithPlaceIds;
 }
 
 const getUserPlanIds = async (req, res) => {
   try {
-    // if (!req.body.uid) {
-    //     return res.status(400).send('uid is required');
-    // }
-
     const uid = req.body.user.uid;
 
     const userQuerySnapshot = await getDocs(
@@ -264,7 +252,7 @@ const getUserPlanIds = async (req, res) => {
 const getPlanById = async (req, res) => {
   try {
     const planId = req.body.planId;
-    console.log("planId: ", planId);
+   
 
     if (!planId) {
       return res.status(400).send("planId is required");
@@ -303,10 +291,9 @@ const deletePlan = async (req, res) => {
       return res.status(400).send("Plan does not have a valid uid");
     }
 
-    // Delete plan from the "plans" collection
+    // Delete plan from the plans collection
     await deleteDoc(doc(db, "plans", planId));
 
-    // Query the users collection to find the document with the given uid
     const usersCollection = collection(db, "users");
     const userQuery = query(usersCollection, where("uid", "==", uid));
     const userQuerySnapshot = await getDocs(userQuery);
@@ -316,7 +303,6 @@ const deletePlan = async (req, res) => {
       return res.status(404).send("User document not found");
     }
 
-    // Assume there's only one document per uid
     const userDocRef = userQuerySnapshot.docs[0].ref;
 
     // Remove the planId from the user's plans array in the user collection
@@ -336,9 +322,7 @@ const editActivity = async (req, res) => {
     const planId = req.body.planId;
     const day = req.body.day;
     const activity = req.body.activity;
-    console.log("planId: ", planId);
-    console.log("day: ", day);
-    console.log("activity: ", activity);
+
 
     if (!planId || !day || !activity) {
       return res.status(400).send("planId, day, and activity are required");
@@ -350,7 +334,7 @@ const editActivity = async (req, res) => {
     }
 
     const planData = planDoc.data();
-    console.log("planData: ", planData);
+  
 
     // Find the user with the correct query
     const usersCollection = collection(db, "users");
@@ -373,14 +357,12 @@ const editActivity = async (req, res) => {
     const preferencesData = preferencesDoc.data();
 
     const activities = planData.travelPlan[day].activities;
-    console.log("activities: ", activities);
     activities.push(activity);
 
     // Gather all activities in the plan to avoid duplicates
     const allActivities = planData.travelPlan.flatMap(
       (dayPlan) => dayPlan.activities
     );
-    console.log("All activities in the plan: ", allActivities);
 
     // Convert place IDs to place names using Google Maps API
     const allActivityNames = await Promise.all(
@@ -401,7 +383,6 @@ const editActivity = async (req, res) => {
     const filteredActivityNames = allActivityNames.filter(
       (name) => name !== null
     );
-    console.log("All activity names in the plan: ", filteredActivityNames);
 
     // Generate 3 additional suitable activities
     const prompt = `I am editing an activity for a user. The user's preferences are: ${JSON.stringify(
@@ -416,14 +397,12 @@ const editActivity = async (req, res) => {
     Please suggest 3 additional activities that are suitable considering the user's preferences and the current activities.
     The format should be a JSON array of activity names.`;
 
-    console.log("Generated prompt for Gemini: ", prompt);
 
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = await response.text();
 
-    console.log("Gemini response text: ", text);
 
     // Extract JSON array from the response text
     const startIndex = text.indexOf("[");
@@ -435,7 +414,6 @@ const editActivity = async (req, res) => {
 
     const additionalActivities = JSON.parse(jsonResponse);
 
-    console.log("Additional activities: ", additionalActivities);
 
     // Fetch place IDs for the new activities
     const newActivitiesWithPlaceIds = await Promise.all(
@@ -456,10 +434,7 @@ const editActivity = async (req, res) => {
       (id) => id !== null && !allActivities.includes(id)
     );
 
-    console.log(
-      "Filtered new activities with place IDs: ",
-      filteredNewActivities
-    );
+      
 
     res.status(200).json({ additionalActivities: filteredNewActivities });
   } catch (error) {
@@ -485,10 +460,7 @@ const replaceActivity = async (req, res) => {
     const dayIndex = req.body.dayIndex;
     const activityIndex = req.body.activityIndex;
     const newActivityName = req.body.newActivity;
-    console.log("planId: ", planId);
-    console.log("dayIndex: ", dayIndex);
-    console.log("activityIndex: ", activityIndex);
-    console.log("newActivityName: ", newActivityName);
+ 
 
     if (
       !planId ||
@@ -509,7 +481,6 @@ const replaceActivity = async (req, res) => {
     }
 
     const planData = planDoc.data();
-    console.log("planData: ", planData);
 
     const travelPlan = planData.travelPlan;
     if (!travelPlan[dayIndex]) {
@@ -524,9 +495,7 @@ const replaceActivity = async (req, res) => {
     }
 
     // Replace the old activity with the new one
-    console.log("Before: ", travelPlan[dayIndex].activities[activityIndex]);
     travelPlan[dayIndex].activities[activityIndex] = newActivityName;
-    console.log("After: ", travelPlan);
 
     // Update the plan in the database
     await updateDoc(doc(db, "plans", planId), { travelPlan });
@@ -538,37 +507,13 @@ const replaceActivity = async (req, res) => {
   }
 };
 
-// async function getActivityPlaceId(activityName, destination) {
-//   const query = `${activityName} in ${destination}`;
-//   const apiUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
-//     query
-//   )}&key=${apiKey}`;
-//   try {
-//     const response = await fetch(apiUrl);
-//     const data = await response.json();
-//     if (data.results && data.results.length > 0) {
-//       return data.results[0].place_id;
-//     } else {
-//       console.error(
-//         `No place found for activity: ${activityName} in destination: ${destination}`
-//       );
-//       return null;
-//     }
-//   } catch (error) {
-//     console.error("Error fetching activity place ID:", error);
-//     return null;
-//   }
-// }
 
-//delete activity
 const deleteActivity = async (req, res) => {
   try {
     const planId = req.body.planId;
     const dayIndex = req.body.dayIndex;
     const activityIndex = req.body.activityIndex;
-    console.log("planId: ", planId);
-    console.log("dayIndex: ", dayIndex);
-    console.log("activityIndex: ", activityIndex);
+  
 
     if (!planId || dayIndex === undefined || activityIndex === undefined) {
       return res
@@ -612,11 +557,9 @@ const deleteActivity = async (req, res) => {
     const dayDate = parseDate(travelPlan[dayIndex].day);
     const arrivalDate = parseDate(planData.arrivalDate);
     const departureDate = parseDate(planData.departureDate);
-    console.log('dayDate:', dayDate, 'arrivalDate: ', arrivalDate, 'departureDate: ', departureDate);
 
     // Check if the day has no activities left, and if so, delete the day
     if (travelPlan[dayIndex].activities.length === 0) {
-      console.log('arrivalDate in if:', arrivalDate.getTime(), 'dayDate in if:', dayDate.getTime());
       if (dayDate.getTime() === arrivalDate.getTime()) {
         planData.arrivalDate = travelPlan.length > 1
           ? travelPlan[1]?.day
@@ -624,14 +567,12 @@ const deleteActivity = async (req, res) => {
             : null
           : null;
       }
-      console.log('departureDate in if:', departureDate.getTime(), 'dayDate in if:', dayDate.getTime());
       if (dayDate.getTime() === departureDate.getTime()) {
         planData.departureDate = travelPlan.length > 0
           ? travelPlan[travelPlan.length - 2]?.day
             ? parseDate(travelPlan[travelPlan.length - 2].day).toISOString().split("T")[0]
             : null
           : null;
-        console.log('departureDate in if222222 enter here should do this here:', planData.departureDate);
       }
       travelPlan.splice(dayIndex, 1);
     }
@@ -712,7 +653,6 @@ const FindRestaurantNearBy = async (req, res) => {
     const response = await result.response;
     const text = await response.text();
 
-    console.log("Gemini response text: ", text);
 
     // Extract JSON array from the response text
     const startIndex = text.indexOf("[");
@@ -724,7 +664,6 @@ const FindRestaurantNearBy = async (req, res) => {
 
     const restaurantNames = JSON.parse(jsonResponse);
 
-    console.log("Restaurant names: ", restaurantNames);
 
     // Fetch place IDs for the restaurant names
     const restaurantsWithPlaceIds = await Promise.all(
@@ -741,7 +680,6 @@ const FindRestaurantNearBy = async (req, res) => {
 
     const validRestaurants = restaurantsWithPlaceIds.filter((restaurant) => restaurant !== null);
 
-    console.log("Restaurants with place IDs: ", validRestaurants);
 
     res.status(200).json(validRestaurants);
   } catch (error) {
@@ -752,7 +690,6 @@ const FindRestaurantNearBy = async (req, res) => {
 };
 
 
-// Add the Restaurant that the user pick to the activities
 const addRestaurantToPlan = async (req, res) => {
   try {
     const { planId, dayIndex, activityIndex, restaurantName, placeId } = req.body;
@@ -771,11 +708,9 @@ const addRestaurantToPlan = async (req, res) => {
     const planData = planDoc.data();
     const travelPlan = planData.travelPlan;
 
-    console.log("Received travelPlan: ", travelPlan);
-    console.log("Looking for day index: ", dayIndex);
+ 
 
     if (!travelPlan[dayIndex]) {
-      console.log(`Day index "${dayIndex}" not found in travel plan`);
       return res.status(404).send("Day not found in travel plan");
     }
 
@@ -786,7 +721,6 @@ const addRestaurantToPlan = async (req, res) => {
     // Insert the restaurant place ID after the specified activity index
     travelPlan[dayIndex].activities.splice(activityIndex + 1, 0, placeId);
 
-    console.log("Updated travelPlan after adding restaurant: ", travelPlan);
 
     // Update the plan in the database
     await updateDoc(doc(db, "plans", planId), { travelPlan });
