@@ -53,6 +53,85 @@ EMAIL_PASSWORD="your_email_password"              # Email password or app-specif
 
 ```
 
+# Firebase Configuration
+
+This project requires Firebase credentials for both **client-side authentication** and **server-side access**. 
+Since these credentials contain **sensitive information**, they are **not included in this repository** and must be manually configured.
+
+## 1️⃣ Setting Up `firebaseConfig.js` (Client SDK)
+
+This file contains the Firebase configuration needed to connect your app to Firebase.
+
+### **Steps to Generate Firebase Config**
+
+1. Go to [Firebase Console](https://console.firebase.google.com/) and select your project.  
+2. Navigate to **Project Settings → General**.  
+3. Scroll down to **Your apps → SDK setup and configuration**.  
+4. Select **"Config"** (not "CDN") and copy the Firebase configuration.  
+5. Create a file in the project root:  
+   ```sh
+   touch firebaseConfig.js
+   ```
+6. Paste the copied configuration into `firebaseConfig.js` following this structure:
+   ```js
+   const { initializeApp } = require('firebase/app');
+   const { getFirestore } = require('firebase/firestore');
+   const { getAuth } = require('firebase/auth');
+
+   const firebaseConfig = {
+       apiKey: "YOUR_API_KEY",
+       authDomain: "YOUR_AUTH_DOMAIN",
+       projectId: "YOUR_PROJECT_ID",
+       storageBucket: "YOUR_STORAGE_BUCKET",
+       messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+       appId: "YOUR_APP_ID",
+       measurementId: "YOUR_MEASUREMENT_ID"
+   };
+
+   const firestore_app = initializeApp(firebaseConfig);
+   const db = getFirestore(firestore_app);
+   const auth = getAuth(firestore_app);
+
+   module.exports = { firestore_app, firebaseConfig, db, auth };
+   ```
+
+## 2️⃣ Setting Up `server-firebase-keys.json` (Admin SDK)
+
+This file contains the **Firebase Admin SDK credentials** needed for server-side authentication and database management.
+
+### **Steps to Generate Firebase Admin Key**
+
+1. Go to **Firebase Console → Project Settings → Service Accounts**.  
+2. Click **"Generate new private key"** under **Firebase Admin SDK**.  
+3. A JSON file will be downloaded automatically.  
+4. Move this file to the root directory of your project.  
+5. Rename the file to `server-firebase-keys.json`.  
+6. **Ensure it is included in `.gitignore`** to prevent accidental uploads.  
+
+Use this file in `firebaseConfig.js` like this:
+```js
+const admin = require('firebase-admin');
+const serviceAccount = require("./server-firebase-keys.json");
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    projectId: "YOUR_PROJECT_ID",
+});
+
+module.exports = { admin };
+```
+
+## 3️⃣ Important Notes
+
+✅ **Never push `server-firebase-keys.json` or sensitive credentials to GitHub.**  
+✅ **Ensure both `firebaseConfig.js` and `server-firebase-keys.json` are included in `.gitignore`.**  
+✅ **Use the Firebase Console to retrieve and manage your API keys safely.**  
+
+---
+
+🔥 **Your Firebase setup is now ready!** If you have any issues, check the official [Firebase Docs](https://firebase.google.com/docs). 🚀
+
+
 ## Installation & Setup
 
 ### Prerequisites
