@@ -109,7 +109,7 @@ const generatePlan = async ({
   social,
   loadLevel,
 }) => {
-  const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
   let numberOfActivities;
   switch (loadLevel) {
@@ -392,7 +392,7 @@ const editActivity = async (req, res) => {
     Please suggest 3 additional activities that are suitable considering the user's preferences and the current activities.
     The format should be a JSON array of activity names.`;
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = await response.text();
@@ -635,7 +635,7 @@ const FindRestaurantNearBy = async (req, res) => {
     Please give restaurants with high rating.
     The format should be a JSON array of restaurant names.`;
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = await response.text();
