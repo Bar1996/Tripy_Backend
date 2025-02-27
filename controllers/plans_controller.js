@@ -108,7 +108,7 @@ const generatePlan = async ({
   loadLevel,
 }) => {
   const model = genAI.getGenerativeModel({
-    model: 'models/gemini-1.0-pro-latest',
+    model: 'models/text-bison-001',
   });
 
   let numberOfActivities;
@@ -393,7 +393,7 @@ const editActivity = async (req, res) => {
     The format should be a JSON array of activity names.`;
 
     const model = genAI.getGenerativeModel({
-      model: 'models/gemini-1.0-pro-latest',
+      model: 'models/text-bison-001',
     });
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -638,7 +638,7 @@ const FindRestaurantNearBy = async (req, res) => {
     The format should be a JSON array of restaurant names.`;
 
     const model = genAI.getGenerativeModel({
-      model: 'models/gemini-1.0-pro-latest',
+      model: 'models/text-bison-001',
     });
     const result = await model.generateContent(prompt);
     const response = await result.response;
