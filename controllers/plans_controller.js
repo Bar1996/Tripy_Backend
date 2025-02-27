@@ -149,7 +149,7 @@ const generatePlan = async ({
     ]
   }`;
 
-  const result = await model.generateContent(prompt);
+  const result = await model.generateText(prompt);
   const response = await result.response;
   const text = await response.text();
   const fetchOrganizedData = await organizeData(text, destination);
@@ -395,7 +395,7 @@ const editActivity = async (req, res) => {
     const model = genAI.getGenerativeModel({
       model: 'models/text-bison-001',
     });
-    const result = await model.generateContent(prompt);
+    const result = await model.generateText(prompt);
     const response = await result.response;
     const text = await response.text();
 
@@ -640,7 +640,7 @@ const FindRestaurantNearBy = async (req, res) => {
     const model = genAI.getGenerativeModel({
       model: 'models/text-bison-001',
     });
-    const result = await model.generateContent(prompt);
+    const result = await model.generateText(prompt);
     const response = await result.response;
     const text = await response.text();
 
